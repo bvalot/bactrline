@@ -1,0 +1,15 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: Name of the sample
+properties:
+  ID:
+    type:
+      - string
+      - integer
+    description: sample ID
+  folder/file:
+    type: string
+    description: path to the file or folder with sample
+    
+required:
+  - ID
+  - folder/file

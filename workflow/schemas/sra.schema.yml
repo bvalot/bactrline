@@ -1,0 +1,19 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: Name of the sample
+properties:
+  ID:
+    type:
+      - string
+      - integer
+    description: sample ID
+  tech:
+    type: string
+    description: sequencing technology used
+  sra_file:
+    type: string
+    description: Run accession or path to the sra file
+    
+required:
+  - ID
+  - R1
+  - R2

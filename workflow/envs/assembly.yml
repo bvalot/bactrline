@@ -1,0 +1,9 @@
+name: assembly
+
+channels: 
+  - conda-forge
+  - bioconda
+  
+dependencies:
+  - Python >= 3.12
+  - spades >= 3.15

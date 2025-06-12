@@ -1,0 +1,47 @@
+### INITIALISATION ###
+
+configfile: "config/config.yml"
+
+# Initialisation of the option
+PLASMID = config['configuration']['plasmid_tool']
+SPECIES = config['configuration']['species']
+
+
+### RULES ###
+
+include: "rules/install.smk"
+include: "rules/common.smk"
+include: "rules/sra.smk"
+include: "rules/trimgalore.smk"
+include: "rules/filtlong.smk"
+include: "rules/subsample.smk"
+include: "rules/assembly.smk"
+include: "rules/flye.smk"
+include: "rules/filter_contigs.smk"
+include: "rules/quality.smk"
+include: "rules/amr.smk"
+include: "rules/pymlst.smk"
+
+if PLASMID == 'platon' or PLASMID == 'platon,plasclass':
+    include: "rules/platon.smk"
+if PLASMID == 'plasclass' or PLASMID == 'platon,plasclass':
+    include: "rules/plasclass.smk"
+
+if SPECIES == 'Staphylococcus aureus':
+    include: "rules/spatyping.smk"
+
+if SPECIES == 'Escherichia coli':
+    include: "rules/clermontyping.smk"
+    include: "rules/fimtyping.smk"
+
+include: "rules/annotation.smk"
+
+
+### TARGET RULES ###
+
+rule all:
+    input :
+        "results/quality_report.tsv",
+        "results/annotation_report.tsv",
+        "results/gene_amr_summary.tsv"
+        

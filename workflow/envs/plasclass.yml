@@ -1,0 +1,8 @@
+name: plasclass
+
+channels:
+  - bioconda
+  - conda-forge
+
+dependencies:
+  - plasclass >= 0.1.1

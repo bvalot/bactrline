@@ -1,0 +1,314 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: Snakemake configuration file
+
+properties:
+  configuration:
+    type: object
+    description: Configuration for the pipeline
+    properties:
+      reference:
+        type: string
+        description: path to the genome reference of the species
+      kraken_db_path:
+        type: string
+        description: path to the kraken database
+      pymlst_db:
+        type: string
+        description: path to the pymlst database
+      platon_db:
+        type: string
+        description: path to the platon database
+      genome_size:
+        type: integer
+        description: size of the reference genome
+      species:
+        type: string
+        description: name of the species
+      plasmid_tool:
+        type: string
+        description: tools used to detect plasmid
+    required:
+      - reference
+      - kraken_db_path
+      - pymlst_db
+      - genome_size
+
+  resources:
+    type: object
+    description: maximum resources that we can use
+    properties:
+      threads:
+        type: number
+        description: maximum number of threads that we can use
+      mem_mb:
+        type: number
+        description: maximum of memory that we can use
+    required:
+      - threads
+      - mem_mb
+
+  trimgalore:
+    type: object
+    description: trimgalore option
+    properties:
+      extra_params:
+        type: string
+        description: other parameters for the tool
+      minimum_length:
+        type: integer
+        description: threshold minimum length
+      quality_cutoff:
+        type: integer
+        description: threshold quality
+    required:
+      - minimum_length
+      - quality_cutoff
+      
+  filtlong:
+    type: object
+    description: filtlong option
+    properties:
+      extra_params:
+        type: string
+        description: other parameters for the tool
+      min_length:
+        type: integer
+        description: threshold minimum length
+      percent:
+        type: integer
+        description: threshold quality
+    required:
+      - min_length
+      - percent
+
+  subsample:
+    type: object
+    description: subsample option
+    properties:
+      coverage:
+        type: number
+        description: minimum of coverage
+      extra_params:
+        type: string
+        description: other parameters for subsample
+    required:
+      - coverage
+
+  assembly:
+    type: object
+    description: assembly option for spades
+    properties:
+      extra_params:
+        type: string
+        description: other parameters for the assembly
+        
+  flye:
+    type: object
+    description: assembly option ofr flye
+    properties:
+      extra_params:
+        type: string
+        description: other parameters for the assembly
+
+  filter_contigs:
+    type: object
+    description: filter contig option
+    properties:
+      coverage:
+        type: integer
+        description: minimum of coverage
+      length:
+        type: integer
+        description: minimum of length
+    required:
+      - coverage
+      - length
+
+  quality:
+    type: object
+    description: quality option
+    properties:
+      min_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent for species find by Kraken2
+      warning_contamination:
+        type:
+          - integer
+          - number
+        description: minimum percent to pass the warning contamination check
+      error_contamination:
+        type:
+          - integer
+          - number
+        description: minimum percent to pass the error contamination check
+      warning_nbr_contig:
+        type:
+          - integer
+          - number
+        description: minimum number of contig to pass the warning contamination check
+      error_nbr_contig:
+        type:
+          - integer
+          - number
+        description: minimum number of contig to pass the error contamination check
+      warning_length_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent for the total length to pass the warning contamination check
+      error_length_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent for the total length to pass the error contamination check
+      warning_gc_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent of GC to pass the warning contamination check
+      error_gc_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent of GC to pass the error contamination check
+      warning_genus_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent of genus to pass the warning contamination check
+      error_genus_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent of genus to pass the error contamination check
+      warning_species_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent of species to pass the warning contamination check
+      error_species_percent:
+        type:
+          - integer
+          - number
+        description: minimum percent os species to pass the error contamination check
+      checkm:
+        type: object
+        description: checkm option
+        properties:
+          extra_params:
+            type: string
+            description: other parameters for checkm
+      kraken:
+        type: object
+        description: kraken2 option
+        properties:
+          extra_params:
+            type: string
+            description: other parameters for kraken2
+      quast:
+        type: object
+        description: quast option
+        properties:
+          extra_params:
+            type: string
+            description: other parameters for quast
+    required:
+      - min_percent
+      - warning_contamination
+      - error_contamination
+      - warning_nbr_contig
+      - error_nbr_contig
+      - warning_length_percent
+      - error_length_percent
+      - warning_gc_percent
+      - error_gc_percent
+      - warning_genus_percent
+      - error_genus_percent
+      - warning_species_percent
+      - error_species_percent
+
+  amrfinder:
+    type: object
+    description: amrfinder option
+    properties:
+      species:
+        type: string
+        description: name of species for the command line of amrfinder
+      extra_params:
+        type: string
+        description: other parameters for amrfinderplus
+    required:
+      - species
+   
+  pymlst:
+    type: object
+    description: pymlst option
+    properties:
+      min_identity:
+        type:
+          - integer
+          - number
+        description: minimum percent for the identity
+      min_coverage:
+        type:
+          - integer
+          - number
+        description: minimum percent for the coverage
+      extra_params:
+        type: string
+        description: other parameters for pymlst
+        
+  annotation:
+    type: object
+    description: annotation option
+    properties:
+      min_length:
+        type:
+          - integer
+        description: minimum length to filter contigs
+      platon:
+        type: object
+        description: platon threshold
+        properties:
+          plasmid_threshold:
+            type:
+              - integer
+              - number
+            description: threshold to consider the contig as a plasmid
+          chromosome_threshold:
+            type:
+              - integer
+              - number
+            description: threshold to consider the contig as a chromosome
+      plasclass:
+        type: object
+        description: plasclass threshold
+        properties:
+          plasmid_threshold:
+            type:
+              - integer
+              - number
+            description: threshold to consider the contig as a plasmid
+          chromosome_threshold:
+            type:
+              - integer
+              - number
+            description: threshold to consider the contig as a chromosome
+      
+
+required:
+  - configuration
+  - resources
+  - trimgalore
+  - filtlong
+  - subsample
+  - assembly
+  - flye
+  - filter_contigs
+  - quality
+  - amrfinder
+  - pymlst
+  - annotation
+

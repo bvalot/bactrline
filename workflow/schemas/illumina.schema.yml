@@ -1,0 +1,19 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: Name of the sample
+properties:
+  ID:
+    type:
+      - string
+      - integer
+    description: sample ID
+  R1:
+    type: string
+    description: path to the sample R1
+  R2:
+    type: string
+    description: path to the sample R2
+    
+required:
+  - ID
+  - R1
+  - R2

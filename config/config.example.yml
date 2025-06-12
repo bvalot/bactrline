@@ -1,0 +1,75 @@
+configuration:
+  reference: resources/reference/reference.fna
+  kraken_db_path: resources/database/k2_standard_16gb_20240605/
+  pymlst_db: resources/database/pyMLST/pymlst.db
+  checkm2_db: resources/database/checkm2/CheckM2_database/uniref100.KO.1.dmnd
+  platon_db: resources/database/platon/db/
+  genome_size: 2821361
+  species: 'Staphylococcus aureus'
+  plasmid_tool: 'platon,plasclass'
+resources:
+  threads: 6
+  mem_mb: 10000
+trimgalore:
+  minimum_length: 30
+  quality_cutoff: 20
+  extra_params: '--paired'
+filtlong:
+  min_length: 1000
+  percent: 90
+  extra_params: ''
+subsample:
+  coverage: 80
+  extra_params: ''
+assembly:
+  extra_params: ''
+flye:
+  extra_params: ''
+filter_contigs:
+  coverage: 2
+  length: 300
+quality:
+  min_percent: 1
+  warning_contamination: 0.5
+  error_contamination: 2
+  warning_nbr_contig: 200
+  error_nbr_contig: 400
+  warning_length_percent: 10
+  error_length_percent: 20
+  warning_gc_percent: 1
+  error_gc_percent: 2
+  warning_genus_percent: 95
+  error_genus_percent: 90
+  warning_species_percent: 95
+  error_species_percent: 90
+  checkm:
+    extra_params: ''
+  kraken:
+    extra_params: ''
+  quast:
+    extra_params: ''
+amrfinder:
+  species: 'Staphylococcus_aureus'
+  extra_params: ''
+platon:
+  extra_params: ''
+plasclass:
+  extra_params: ''
+pymlst:
+  min_identity: 0.9
+  min_coverage: 0.9
+  extra_params: ''
+clermontyping:
+  extra_params: ''
+fimtyping:
+  extra_params: ''
+spatyping:
+  extra_params: ''
+annotation:
+  min_length: 1000
+  platon:
+    plasmid_threshold: 0.5
+    chromosome_threshold: -13
+  plasclass:
+    plasmid_threshold: 0.9
+    chromosome_threshold: 0.7
