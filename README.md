@@ -226,9 +226,9 @@ The pipeline gives three final reports, which you can find in the `workflow/repo
 
 
 ## Authors
-Adeline Gagnon
-Ana Temtem
-Benoit Valot
+- Adeline Gagnon
+- Ana Temtem
+- Benoit Valot
 
 ## Citation
 
