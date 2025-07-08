@@ -44,26 +44,23 @@ mamba --version
 #### 2. Installation of Snakemake
 
 ```
-mamba create -c conda-forge -c bioconda -n snakemake snakemake
-mamba activate snakemake
+git clone https://github.com/bvalot/bactrline.git
+cd bactrline
+mamba create -f workflow/envs/default.yml
+mamba activate bactRline
 snakemake --help
 ```
 
+If you want to centralise your conda environnements to be reuse between different project,
+you can specify it with this env variable
+
+```
+SNAKEMAKE_CONDA_PREFIX=/path/to/env
+conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
+```
 
 #### 3. Configuration
 
-If you use the script below to configure the configuration file, you need to install python with the following package:
-* pyyaml
-* Levenshtein
-
-You can install it with mamba in your snakemake environment:
-
-```
-mamba install pyyaml
-mamba install levenshtein
-```
-
-\
 Snakemake needs a configuration file to run. \
 You can generate it with the following script `workflow/scripts/configuration.py`, or you can write it manually in `config/config.yml` using the example in `config/config.example.yml`. \
 The configuration file must include the following key sections:
