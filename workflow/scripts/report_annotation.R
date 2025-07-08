@@ -29,7 +29,6 @@ for (file_name in file_list_amr) {
     
     # Extracting the sample name from the file name
     sample_name <- sub("_AMR.tsv", "", basename(file_name))
-
     if (nrow(data) > 0) {
         # Extracting identity and coverage of amr
         data$idcovplas <- paste0(data$"% Identity to reference", "/", data$"% Coverage of reference")
@@ -53,8 +52,10 @@ for (file_name in file_list_amr) {
     ## Platon
     if (plasmid_tool == "platon" | plasmid_tool == "platon,plasclass") {
         # Find the file corresponding to the AMR file
-        platon_file <- grep(sample_name, file_list_platon, value = TRUE)
-        data_platon <- read.table(platon_file, header = TRUE, sep = "\t", check.names = FALSE, comment.char = "", quote = "")
+        platon_file <- grep(paste(sample_name,".tsv$", sep=""), file_list_platon,
+                            value = TRUE, perl=TRUE)
+        data_platon <- read.table(platon_file, header = TRUE, sep = "\t", check.names = FALSE,
+                                  comment.char = "", quote = "")
         
         # Filter contigs by length and assign them a class (chromosomal, plasmid, unknown or unanalyzed)
         data_platon$Platon <- ifelse(data_platon$Length >= min_length, ifelse(data_platon$RDS >= plas_thresh_platon, 'P', ifelse(data_platon$RDS < plas_thresh_platon & data_platon$RDS >= chr_thresh_platon, 'U', 'C')), NA)
@@ -63,7 +64,8 @@ for (file_name in file_list_amr) {
     ## Plasclass
     if (plasmid_tool == "plasclass" | plasmid_tool == "platon,plasclass") {
         # Find the file corresponding to the AMR file
-        plasclass_file <- grep(sample_name, file_list_plasclass, value = TRUE)
+        plasclass_file <- grep(paste(sample_name,".tsv$", sep=""),
+                               file_list_plasclass, value = TRUE, perl=TRUE)
         data_plasclass <- read.table(plasclass_file, sep = "\t")
         
         # Extract length of the contig name
