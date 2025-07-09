@@ -148,7 +148,7 @@ SNAKEMAKE_CONDA_PREFIX=/path/to/env
 conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
 ```
 
-This step could take some times!!!
+> Note: This step could take some times!!!
 
 
 ### Usage
