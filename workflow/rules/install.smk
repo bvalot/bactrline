@@ -11,7 +11,7 @@ rule install_amrfinder_db:
 
 rule install_pymlst_db:
     output:
-        pymlst_db = "resources/database/pyMLST/pymlst.db"
+        pymlst_db =  config['configuration']['pymlst_db']
     conda:
         "../envs/pymlst.yml"
     params:
@@ -24,13 +24,13 @@ rule install_pymlst_db:
 
 rule install_checkm2_db:
     output:
-        checkm2_db = "resources/database/checkm2/CheckM2_database/uniref100.KO.1.dmnd"
+        checkm2_db = config['configuration']['checkm2_db']
     conda:
         "../envs/checkm2.yml"
     params:
-        checkm2_dir = "resources/database/checkm2"
+        checkm2_dir = os.path.dirname(config['configuration']['checkm2_db']).rstrip('CheckM2_database')
     shell:
         """
-        checkm2 database --download --path {params.checkm2_dir}
+		checkm2 database --download --path {params.checkm2_dir}
         """
 

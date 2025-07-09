@@ -51,13 +51,6 @@ mamba activate bactRline
 snakemake --help
 ```
 
-If you want to centralise your conda environnements to be reuse between different project,
-you can specify it with this env variable
-
-```
-SNAKEMAKE_CONDA_PREFIX=/path/to/env
-conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
-```
 
 #### 3. Configuration
 
@@ -123,10 +116,10 @@ You can download the Kraken2 and Platon databases manually by following the step
 
 ```
 # Kraken2 database
-wget -P resources/database https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16gb_20240605.tar.gz
-mkdir -p resources/database/k2_standard_16gb_20240605
-tar -xzf resources/database/k2_standard_16gb_20240605.tar.gz -C resources/database/k2_standard_16gb_20240605
-rm resources/database/k2_standard_16gb_20240605.tar.gz
+wget -P resources/database https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16gb_20250402.tar.gz
+mkdir -p resources/database/k2_standard_16gb_20250402
+tar -xzf resources/database/k2_standard_16gb_20250402.tar.gz -C resources/database/k2_standard_16gb_20250402
+rm resources/database/k2_standard_16gb_20250402.tar.gz
 ```
 
 ```
@@ -139,23 +132,40 @@ rm resources/database/platon/db.tar.gz
 Please check that the path in the configuration file corresponds to the database path.
 
 
+##### 6. Installation of conda environnements
+
+You can install conda environment before running the pipeline:
+
+```
+snakemake --conda-create-envs-only --use-conda
+```
+
+By default, Snakemake generates its environments in a folder local to your project `.snakemake/conda/`. If you plan to have several projects, you can use the following option `--conda-prefix /path/to/conda_envs/` to generate or use environments in a folder of your choice.
+You can also defined it as default in your bactrline environment:
+
+```
+SNAKEMAKE_CONDA_PREFIX=/path/to/env
+conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
+```
+
+This step could take some times!!!
+
+
 ### Usage
 
 Before running the pipeline, you can check that everything is working correctly using `--dry-run option`:
 
 ```
-snakemake --dry-run
+snakemake --use-conda --dry-run
 ```
 
 This will simulate the workflow without executing any commands.
 
-Then, from the cloned Git repository, run the pipeline with the folowing command:
+Then, from the cloned Git repository, run the pipeline with the folowing command :
 
 ```
 snakemake --use-conda
 ```
-
-By default, Snakemake generates its environments in a folder local to your project `.snakemake/conda/`. If you plan to have several projects, you can use the following option `--conda-prefix /path/to/conda_envs/` to generate or use environments in a folder of your choice.
 
 If you want to run only the assembly part, for example, you can run this command:
 

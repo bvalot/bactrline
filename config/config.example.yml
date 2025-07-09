@@ -1,6 +1,6 @@
 configuration:
   reference: resources/reference/reference.fna
-  kraken_db_path: resources/database/k2_standard_16gb_20240605/
+  kraken_db_path: resources/database/k2_standard_16gb_20250402/
   pymlst_db: resources/database/pyMLST/pymlst.db
   checkm2_db: resources/database/checkm2/CheckM2_database/uniref100.KO.1.dmnd
   platon_db: resources/database/platon/db/
