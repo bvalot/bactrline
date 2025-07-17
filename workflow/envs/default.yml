@@ -7,4 +7,5 @@ channels:
 dependencies:
   - snakemake >= 8.27
   - pyyaml >= 6.0
-  - levenshtein >= 0.27
+  - biopython >= 1.8
+  - ncbi-datasets-cli >= 18.4

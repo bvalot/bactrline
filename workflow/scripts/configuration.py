@@ -1,90 +1,154 @@
 import yaml
-from Levenshtein import distance
+#from Levenshtein import distance
+import levenshtein2 as le
+import subprocess
+import tempfile
+import json
+from io import StringIO
+from zipfile import ZipFile
+import shutil
+import os
+from Bio import SeqIO
 
+def ask(quest):
+    respon = ''
+    while respon != 'y' and respon != 'n':
+        respon = input(quest + " [y/n] ")
+    if respon == 'y':
+        return True
+    return False
+
+def ask_path(quest, fi=True, wait=""):
+    print("coucou")
+    respon = ''
+    while respon == '' and os.path.exists(respon) is False:
+        respon = input(quest + " [path] ")
+        if fi:
+            if os.path.isdir(respon) or respon.endswith(wait) is False:
+                info("You must select an file finishing by", wait)
+                respon = ''
+        else:
+            if os.path.isfile(respon):
+                info("You must select an folder containing the database")
+                respon = ''
+                
+    return respon
+
+def info(infor, value = ''):
+    if value == '':
+        print( infor + "\n")
+    else:
+        print( infor + " : " + value + "\n")
+
+##Config file
 with open("config/config.example.yml", "r") as file:
     config = yaml.safe_load(file)
+info("Load config file", "ok")
     
 with open("config/amrfinder_species.yml", "r") as file:
     species_data = yaml.safe_load(file)
 amrfinder_species = species_data["amrfinder_species"]
+info("Load AMRFinder species list", "ok")
 
+##species validation
 species = input("Please indicate the full name of your species: ")
 
-d_ecoli = distance("Escherichia coli", species)
-if ( 0 <= d_ecoli <= 6):
-    ecoli = ''
-    while ecoli != 'y' and ecoli != 'n': 
-        ecoli = input("Is Escherichia coli ? [y/n] ")
-    if ecoli == 'y':
-        species = 'Escherichia coli'
-        
-d_staph = distance("Staphylococcus aureus", species)
-if ( 0 <= d_staph <= 6):
-    staph = ''
-    while staph != 'y' and ecoli != 'n': 
-        staph = input("Is Staphylococcus aureus ? [y/n] ")
-    if staph == 'y':
-        species = 'Staphylococcus aureus'
+info("Validate species on NCBI taxonomy")
+taxo = subprocess.run(["datasets", "summary", "taxonomy", "taxon", species], capture_output=True, text=True)
+if taxo.stderr == '':
+    taxo = json.load(StringIO(taxo.stdout))
+    count = taxo.get("total_count")
+    if count != 1:
+        info("No correct species found")
+    info("Number of species found", str(count))
+    try:
+        taxid = taxo.get('reports')[0].get('taxonomy').get('tax_id')
+        info("Species taxid found", str(taxid))
+    except:
+        info("Taxid not found", "skip reference download")
+        taxid = None
+else:
+    info("Error during taxonomy check", "\n" +  taxo.stderr)
+    exit()
 
-print("Your species selected: ", species)
+reference = False
+if taxid and ask("Do you want to download reference genome"):
+    tmp = tempfile.TemporaryDirectory()
+    tmpfi = tmp.name + "/" + "ncbi_dataset.zip"
+    data = subprocess.run(["datasets", "download", "genome", "taxon", str(taxid), "--include",
+                           "genome", "--reference", "--filename", tmpfi, "--no-progressbar"],
+                          capture_output=True, text=True)
+    if data.stderr != '':
+        info("Error during reference download", "\n" + data.stderr)
+        shutil.rmtree(tmp.name)
+        exit()
 
-print("\nSelect species for AMRFinder analysis... ")
+    zip = ZipFile(tmpfi, 'r')
+    seqs = [i for i in zip.namelist() if i.endswith("fna")]
+    if len(seqs) == 0:
+        print("Found no reference genome")
+    else:
+        extr = zip.extract(seqs[0], tmp.name)
+        ref = config['configuration']['reference']
+        os.makedirs(os.path.dirname(ref), exist_ok=True)
+        shutil.move(extr, ref)
+        reference = True
+    shutil.rmtree(tmp.name)
 
-best_species = None
-min_distance = None
+
+##Genome size
+if reference:
+    genome_size = 0
+    for seq in SeqIO.parse(config['configuration']['reference'], 'fasta'):
+        genome_size += len(seq.seq)
+else:
+    genome_size = input("Please indicate the size of the genome in bp: ")
+    genome_size = int(genome_size)
+
+info("The genome size was in bp", str(genome_size))
+
+
+##AMRFinder
+info("Select species for AMRFinder analysis... ")
+
+best_species = ''
 
 for name in amrfinder_species:
-    d = distance(species, name)
-    if min_distance == None or d < min_distance:
-        min_distance = d
+    if le.diff_less_than_nogap(species, name, 3):
         best_species = name
-
-max_threshold = 10
-
-if min_distance <= max_threshold:
-    print("Species find : ", best_species)
-    good_species = ''
-    while good_species != 'y' and good_species != 'n': 
-        good_species = input("Is the good species ? [y/n] ")
-    if good_species == 'y':
-        print("Species selected for AMRFinder analysis: ", best_species)
-    elif good_species == 'n':
-        print(amrfinder_species, "\n")
-        species_list = ''
-        while species_list != 'y' and species_list != 'n':
-            species_list = input("Is your species on this list ? [y/n] ")
-        if species_list == 'y':
-            best_species = ''
-            while best_species not in amrfinder_species:
-                best_species = input("\nPlease specify the exact name: ")
-            print("Species selected for AMRFinder analysis : ", best_species)
-        elif species_list == 'n':
-            best_species = ''
-            print("No species found for AMRFinder analysis.")
+if best_species == '':
+    info("No species found for AMRFinder analysis")
 else:
-    best_species = ''
-    print("No species found for AMRFinder analysis.")
+    info("Species selected for AMRFinder analysis", best_species)
 
 
-genome_size = input("\nPlease indicate the size of the genome: ")
-genome_size = int(genome_size)
-print("Your size selected: ", genome_size)
+##Plasmid
+plasmid_tool = ''
+if ask("Would you like to use a plasmid analysis tool ?"):
+    tmp = []
+    if ask("Do you want to use Platon?"):
+        tmp.append("platon")
+    if ask("Do you want to use Plasclass?"):
+        tmp.append("plasclass")
+    plasmid_tool = ",".join(tmp)
+    info("Plasmid tool selected", plasmid_tool)
+else:
+    info("No plasmid analysis tools used.")
 
-plasmid = ''
-while plasmid != 'y' and plasmid != 'n':
-    plasmid = input("\nWould you like to use a plasmid analysis tool ? [y/n] ")
-if plasmid == 'y':
-    plasmid_tool = ''
-    while plasmid_tool != 'platon' and plasmid_tool != 'plasclass' and plasmid_tool != 'both':
-        plasmid_tool = input("Do you want to use Platon, Plasclass or both ? [platon/plasclass/both] ")
-    if plasmid_tool == 'both':
-        plasmid_tool = 'platon,plasclass'
-    print("Plasmid tool selected :", plasmid_tool)
-elif plasmid == 'n':
-    plasmid_tool = ''
-    print("No plasmid analysis tools used.")
 
-print("\nCreation of the config file ...")
+info("Database configuration")
+if ask("Do you have already installed kraken database?"):
+    kraken = ask_path("Select kraken database folder", fi=False)
+    config['configuration']['kraken_db_path'] = kraken
+if ask("Do you have already installed CheckM2 database?"):
+    checkm2 = ask_path("Select CheckM2 file .dmnd", wait="dmnd")
+    config['configuration']['checkm2_db'] = checkm2
+if ask("Do you have already installed Platon database?"):
+    platon = ask_path("Select Platon database folder", fi=False)
+    config['configuration']['platon_db'] = platon
+
+
+info("Creation of the config file ...")
 config['configuration']['species'] = species
 config['configuration']['genome_size'] = genome_size
 config['configuration']['plasmid_tool'] = plasmid_tool
@@ -94,5 +158,5 @@ config_file = "config/config.yml"
 with open(config_file, "w") as file:
     yaml.dump(config, file, default_flow_style=False, sort_keys=False, allow_unicode=True)
 
-print(f"The configuration file has been created in {config_file}.\nPlease check that the information is correct, otherwise you can manually modify the file or regenerate this script.")
+info(f"The configuration file has been created in {config_file}.\nPlease check that the information is correct, otherwise you can manually modify the file or regenerate this script.")
 

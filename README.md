@@ -51,6 +51,14 @@ mamba activate bactRline
 snakemake --help
 ```
 
+By default, Snakemake generates its environments in a folder local to your project `.snakemake/conda/`. If you plan to have several projects, you can use the following option `--conda-prefix /path/to/conda_envs/` to generate or use environments in a folder of your choice.
+You can also defined it as default in your bactrline environment:
+
+```
+SNAKEMAKE_CONDA_PREFIX=/path/to/env
+conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
+```
+
 
 #### 3. Configuration
 
@@ -138,14 +146,6 @@ You can install conda environment before running the pipeline:
 
 ```
 snakemake --conda-create-envs-only --use-conda
-```
-
-By default, Snakemake generates its environments in a folder local to your project `.snakemake/conda/`. If you plan to have several projects, you can use the following option `--conda-prefix /path/to/conda_envs/` to generate or use environments in a folder of your choice.
-You can also defined it as default in your bactrline environment:
-
-```
-SNAKEMAKE_CONDA_PREFIX=/path/to/env
-conda env config vars set SNAKEMAKE_CONDA_PREFIX=$SNAKEMAKE_CONDA_PREFIX
 ```
 
 > Note: This step could take some times!!!
