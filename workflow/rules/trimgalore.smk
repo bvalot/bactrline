@@ -39,4 +39,3 @@ rule trimgalore:
             "$input_read_1" \
             "$input_read_2" &> {log}
         """
-

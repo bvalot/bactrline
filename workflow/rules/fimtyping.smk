@@ -5,7 +5,7 @@ rule all_fimtyping:
 
 rule fimtyping:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
     output:
         fimtyping_tsv = "data/intermediate/fimtyping/{sample}_FIM.tsv"
     log: "logs/fimtyping/{sample}.log"
@@ -18,6 +18,6 @@ rule fimtyping:
         pyTyper search -o {output.fimtyping_tsv} \
         {params.extra_params} \
         fim \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
 

@@ -1,0 +1,8 @@
+name: nextpolishenv
+
+channels:
+  - bioconda
+
+dependencies:
+  - medaka
+

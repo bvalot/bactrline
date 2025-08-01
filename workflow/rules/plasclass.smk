@@ -5,7 +5,7 @@ rule all_plasclass:
 
 rule plasclass:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
     output:
         plasclass_file = "data/intermediate/plasclass/{sample}.tsv"
     conda:
@@ -16,7 +16,7 @@ rule plasclass:
     shell:
         """
         classify_fasta.py \
-        --fasta {input.filtered_contig} \
+        --fasta {input.polished_contig} \
         --outfile {output.plasclass_file} \
         {params.extra_params} > {log} 2>&1
         """
