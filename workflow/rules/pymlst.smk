@@ -5,7 +5,7 @@ rule all_pymlst:
 
 rule pymlst:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
         database = config['configuration']['pymlst_db']
     output:
         pymlst_file = "data/intermediate/pymlst/{sample}_MLST.tsv"
@@ -23,6 +23,6 @@ rule pymlst:
         --output {output.pymlst_file} \
         {params.extra_params} \
         {input.database} \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
 

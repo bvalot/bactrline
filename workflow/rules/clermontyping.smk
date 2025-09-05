@@ -5,7 +5,7 @@ rule all_clermontyping:
 
 rule clermontyping:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
     output:
         clermontyping_tsv = "data/intermediate/clermontyping/{sample}_CLMT.tsv"
     log: "logs/clermontyping/{sample}.log"
@@ -18,6 +18,6 @@ rule clermontyping:
         pyTyper search -o {output.clermontyping_tsv} \
         {params.extra_params} \
         clmt \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
 

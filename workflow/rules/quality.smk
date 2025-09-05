@@ -13,7 +13,7 @@ rule all_kraken:
 
 rule kraken:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
         database_path = config['configuration']['kraken_db_path']
     output:
         kraken_output = "data/intermediate/kraken/{sample}_standard_output.txt"
@@ -31,7 +31,7 @@ rule kraken:
         --threads {threads} \
         --output {output.kraken_output} \
         {params.extra_params} \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
         
 
@@ -62,7 +62,7 @@ rule all_quast:
 
 rule quast:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
     output:
         quast_report = "data/intermediate/quast/{sample}/transposed_report.tsv"
     log: "logs/quast/{sample}.log"
@@ -74,7 +74,7 @@ rule quast:
         extra_params = config['quality']['quast']['extra_params']
     shell:
         """
-        quast {input.filtered_contig} \
+        quast {input.polished_contig} \
         -o {params.quast_directory} \
         -r {params.reference_file} \
         {params.extra_params} > {log} 2>&1
@@ -90,7 +90,7 @@ rule all_checkm2:
 
 rule checkm2:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
         database = config['configuration']['checkm2_db']
     output:
         checkm_log = "data/intermediate/checkm2/{sample}/quality_report.tsv"
@@ -107,7 +107,7 @@ rule checkm2:
     shell:
         """
         checkm2 predict -t {threads} \
-        --input {input.filtered_contig} \
+        --input {input.polished_contig} \
         --output-directory {params.output_directory} \
         --database_path {input.database} \
         --extension {params.extension} \

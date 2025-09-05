@@ -5,7 +5,7 @@ rule all_platon:
 
 rule platon:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
         database = config['configuration']['platon_db']
     output:
         platon_file = "data/intermediate/platon/{sample}/{sample}.tsv"
@@ -24,6 +24,6 @@ rule platon:
         --characterize \
         --threads {threads} \
         {params.extra_params} \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
 

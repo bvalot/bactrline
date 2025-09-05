@@ -1,0 +1,9 @@
+name: nextpolishenv
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - nextpolish >= 1.4.1
+

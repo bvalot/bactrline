@@ -21,6 +21,8 @@ include: "rules/filter_contigs.smk"
 include: "rules/quality.smk"
 include: "rules/amr.smk"
 include: "rules/pymlst.smk"
+include: "rules/nextpolish.smk"
+include: "rules/medaka.smk"
 
 if PLASMID == 'platon' or PLASMID == 'platon,plasclass':
     include: "rules/platon.smk"

@@ -5,7 +5,7 @@ rule all_amrfinder:
 
 rule amrfinder:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
         setup = "resources/database/amr/amrfinder.setup"
     output:
         amr_tsv = "data/intermediate/amr/{sample}_AMR.tsv"
@@ -18,7 +18,7 @@ rule amrfinder:
         extra_params = config['amrfinder']['extra_params']
     shell: 
         """
-        amrfinder -n {input.filtered_contig} \
+        amrfinder -n {input.polished_contig} \
         -o {output.amr_tsv} \
         --organism {params.species} \
         --name {wildcards.sample} \

@@ -5,7 +5,7 @@ rule all_spatyping:
 
 rule spatyping:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        polished_contig = lambda wc: (f"data/intermediate/polished_contigs/{wc.sample}/medaka/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/polished_contigs/{wc.sample}/nextpolish/genome.nextpolish.fasta"),
     output:
         spa_tsv = "data/intermediate/spatyping/{sample}_SPA.tsv"
     conda:
@@ -19,6 +19,6 @@ rule spatyping:
         pyTyper search -o {output.spa_tsv} \
         {params.extra_params} \
         spa \
-        {input.filtered_contig} > {log} 2>&1
+        {input.polished_contig} > {log} 2>&1
         """
 
