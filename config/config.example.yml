@@ -49,7 +49,7 @@ quality:
   quast:
     extra_params: ''
 amrfinder:
-  species: 'Staphylococcus_aureus'
+  species: ''
   extra_params: ''
 platon:
   extra_params: ''

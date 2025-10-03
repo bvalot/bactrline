@@ -16,15 +16,25 @@ rule amrfinder:
     params:
         species = config['amrfinder']['species'],
         extra_params = config['amrfinder']['extra_params']
-    shell: 
-        """
-        amrfinder -n {input.filtered_contig} \
-        -o {output.amr_tsv} \
-        --organism {params.species} \
-        --name {wildcards.sample} \
-        --plus \
-        --log {log} \
-        -q \
-        {params.extra_params}
-        """
+    run: 
+        if config['amrfinder']['species'] == '':
+            shell("""
+            amrfinder -n {input.filtered_contig} \
+            -o {output.amr_tsv} \
+            --name {wildcards.sample} \
+            --log {log} \
+            -q \
+            {params.extra_params}
+            """)
+        else:
+            shell("""
+            amrfinder -n {input.filtered_contig} \
+            -o {output.amr_tsv} \
+            --organism {params.species} \
+            --name {wildcards.sample} \
+            --plus \
+            --log {log} \
+            -q \
+            {params.extra_params}
+            """)
 
