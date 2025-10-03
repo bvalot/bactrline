@@ -14,7 +14,7 @@ rule sra_illumina:
     conda:
         "../envs/sra.yml"
     params:
-        sra_file = lambda wildcards: sra.loc[wildcards.sample, "sra_file/sra_ID"],
+        sra_file = lambda wildcards: sra.loc[wildcards.sample, "sra_ID"],
         out_dir = "data/raw/sra/{sample}/"
     shell:
         """
@@ -22,8 +22,10 @@ rule sra_illumina:
         --split-files \
         --outdir {params.out_dir} > {log} 2>&1
         
-        gzip {params.out_dir}{wildcards.sample}_1.fastq
-        gzip {params.out_dir}{wildcards.sample}_2.fastq
+        gzip -5 -c {params.out_dir}{params.sra_file}_1.fastq > {output.fastq_file_1}
+        gzip -5 -c {params.out_dir}{params.sra_file}_2.fastq > {output.fastq_file_2}
+		rm {params.out_dir}{params.sra_file}_1.fastq
+		rm {params.out_dir}{params.sra_file}_2.fastq
         """
         
         
@@ -43,5 +45,6 @@ rule sra_nanopore:
         --split-files \
         --outdir {params.out_dir} > {log} 2>&1
         
-        gzip {params.out_dir}{wildcards.sample}.fastq
+        gzip -5 -c {params.out_dir}{params.sra_file}.fastq > {output.fastq_file}
+		rm {params.out_dir}{params.sra_file}.fastq
         """

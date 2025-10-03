@@ -9,11 +9,11 @@ properties:
   tech:
     type: string
     description: sequencing technology used
-  sra_file:
+  sra_ID:
     type: string
     description: Run accession or path to the sra file
     
 required:
   - ID
-  - R1
-  - R2
+  - tech
+  - sra_ID
