@@ -19,7 +19,6 @@ def ask(quest):
     return False
 
 def ask_path(quest, fi=True, wait=""):
-    print("coucou")
     respon = ''
     while respon == '' and os.path.exists(respon) is False:
         respon = input(quest + " [path] ")
@@ -109,17 +108,16 @@ info("The genome size was in bp", str(genome_size))
 
 
 ##AMRFinder
-info("Select species for AMRFinder analysis... ")
-
 best_species = ''
 
-for name in amrfinder_species:
-    if le.diff_less_than_nogap(species, name, 3):
-        best_species = name
-if best_species == '':
-    info("No species found for AMRFinder analysis")
-else:
-    info("Species selected for AMRFinder analysis", best_species)
+if ask("Would you like to specify a species for AMRFinder analysis ?"):
+    for name in amrfinder_species:
+        if le.diff_less_than_nogap(species, name, 3):
+            best_species = name
+    if best_species == '':
+        info("No species found for AMRFinder analysis")
+    else:
+        info("Species selected for AMRFinder analysis", best_species)
 
 
 ##Plasmid
