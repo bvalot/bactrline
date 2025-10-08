@@ -26,16 +26,19 @@ rule filtlong:
         
         read_path="${{input_read%/}}"
         if [ -d "$read_path" ]; then
-            cat "$read_path"/*.fastq.gz > "$read_path"/all_{wildcards.sample}.fastq.gz
+		    if [ ! -d "data/raw/nanopore/" ]; then
+			    mkdir -p data/raw/nanopore/
+			fi
+		   	cat "$read_path"/*.fastq.gz > "data/raw/nanopore/{wildcards.sample}.fastq.gz"
             filtlong --min_length {params.min_length} \
             --keep_percent {params.percent} \
             {params.extra_params} \
-            "$read_path"/all_{wildcards.sample}.fastq.gz 2> {log} | gzip > {output.trim_read}
+            "data/raw/nanopore/{wildcards.sample}.fastq.gz" 2> {log} | gzip -5 > "{output.trim_read}"
         else
             filtlong --min_length {params.min_length} \
             --keep_percent {params.percent} \
             {params.extra_params} \
-            "$read_path" 2> {log} | gzip > {output.trim_read}
+            "$read_path" 2> {log} | gzip -5 > "{output.trim_read}"
         fi
         """
 
