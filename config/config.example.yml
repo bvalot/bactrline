@@ -25,6 +25,8 @@ assembly:
   extra_params: ''
 flye:
   extra_params: ''
+medaka:
+  extra_params: ''
 filter_contigs:
   coverage: 2
   length: 300

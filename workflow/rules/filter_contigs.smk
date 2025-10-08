@@ -5,9 +5,11 @@ rule all_filter:
 
 rule filter:
     input:
-        contigs_file = lambda wc: (f"data/intermediate/flye/{wc.sample}/assembly.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/assembled/{wc.sample}_assembled/contigs.fasta")
+        contigs_file = lambda wc: (f"data/intermediate/polishing/{wc.sample}/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/assembled/{wc.sample}_assembled/contigs.fasta")
     output:
         filtered_contigs_file = "data/intermediate/filtered_contigs/{sample}.fasta"
+    log:
+        "logs/filter_contig/{sample}.log"
     params:
         info_file = "data/intermediate/flye/{sample}/assembly_info.txt",
         cov_contig = config['filter_contigs']['coverage'],
