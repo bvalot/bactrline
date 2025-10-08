@@ -37,7 +37,7 @@ rule sra_nanopore:
     conda:
         "../envs/sra.yml"
     params:
-        sra_file = lambda wildcards: sra.loc[wildcards.sample, "sra_file/sra_ID"],
+        sra_file = lambda wildcards: sra.loc[wildcards.sample, "sra_ID"],
         out_dir = "data/raw/sra/{sample}/"
     shell:
         """
