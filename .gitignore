@@ -28,6 +28,7 @@ config/sample_illumina.tsv
 config/sample_nanopore.tsv
 config/sra.tsv
 config/config.yml
+config/genomes_assembled.tsv
 
 resources/**
 results/**

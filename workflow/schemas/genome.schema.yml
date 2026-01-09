@@ -1,0 +1,15 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: Name of the sample
+properties:
+  ID:
+    type:
+      - string
+      - integer
+    description: sample ID
+  file:
+    type: string
+    description: path to the assembled genome file
+    
+required:
+  - ID
+  - file
