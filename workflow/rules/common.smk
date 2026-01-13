@@ -10,12 +10,12 @@ samples = pd.read_csv("config/samplesheet.tsv", sep="\t").set_index("ID", drop=F
 samples.index = samples.index.astype(str)
 validate(samples, "../schemas/samples.schema.yml")
 
-if os.path.exists("config/genomes_assembled.tsv"):
-    assembled = pd.read_csv("config/genomes_assembled.tsv", sep="\t").set_index("ID", drop=False)
+if os.path.exists("config/assembled.tsv"):
+    assembled = pd.read_csv("config/assembled.tsv", sep="\t").set_index("ID", drop=False)
 else:
-    assembled = pd.read_csv("config/genomes_assembled.example.tsv", sep="\t").set_index("ID", drop=False)
+    assembled = pd.read_csv("config/assembled.example.tsv", sep="\t").set_index("ID", drop=False)
 assembled.index = assembled.index.astype(str)
-validate(assembled, "../schemas/genome.schema.yml")
+validate(assembled, "../schemas/assembled.schema.yml")
 
 if os.path.exists("config/sample_illumina.tsv"):
     illumina = pd.read_csv("config/sample_illumina.tsv", sep="\t").set_index("ID", drop=False)
@@ -49,7 +49,7 @@ ASSEMBLED = samples.index.intersection(assembled.index)
 
 
 samples["type"] = np.nan
-samples.loc[samples.index.isin(ASSEMBLED), "type"] = "genome assembled"
+samples.loc[samples.index.isin(ASSEMBLED), "type"] = "assembled"
 samples.loc[samples.index.isin(NANOPORE_SAMPLES), "type"] = "nanopore"
 samples.loc[samples.index.isin(SRA_NANOPORE_SAMPLES), "type"] = "nanopore sra"
 samples.loc[samples.index.isin(ILLUMINA_SAMPLES), "type"] = "illumina"
