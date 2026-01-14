@@ -1,3 +1,11 @@
+def get_nanopore_file(wildcards):
+    sample = wildcards.sample
+    if samples.loc[sample, "type"] == "nanopore":
+        return "nanopore"
+    elif samples.loc[sample, "type"] == "nanopore sra":
+        return "sra"
+
+
 rule all_filtlong:
     input:
         expand("data/intermediate/filtlong/{sample}.fastq.gz", sample=ALL_NANOPORE_SAMPLES)
@@ -5,8 +13,13 @@ rule all_filtlong:
         
 rule filtlong:
     input:
-        read = lambda wc: (nanopore.loc[wc.sample, "folder/file"] if wc.sample in nanopore.index else []),
-        sra = lambda wc: (f"data/raw/sra/{wc.sample}/{wc.sample}.fastq.gz" if (wc.sample in sra.index and sra.loc[wc.sample, "tech"] == "nanopore") else [])
+        branch(
+            get_nanopore_file,
+            cases={
+                "nanopore": lambda wc: nanopore.loc[wc.sample, "folder/file"],
+                "sra": "data/raw/sra/{sample}/{sample}.fastq.gz"
+            }
+        )
     output:
         trim_read = "data/intermediate/filtlong/{sample}.fastq.gz"
     log: "logs/filtlong/{sample}.log"
@@ -18,12 +31,6 @@ rule filtlong:
         extra_params = config['filtlong']['extra_params']
     shell:
         """
-        if [ "{input.read}" != "" ]; then
-            input_read="{input.read}"
-        else
-            input_read="{input.sra}"
-        fi
-        
         read_path="${{input_read%/}}"
         if [ -d "$read_path" ]; then
 		    if [ ! -d "data/raw/nanopore/" ]; then

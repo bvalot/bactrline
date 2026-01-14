@@ -1,3 +1,11 @@
+def get_sample_file(wildcards):
+    sample = wildcards.sample
+    if samples.loc[sample, "type"] == "illumina":
+        return "illumina"
+    elif samples.loc[sample, "type"] == "illumina sra":
+        return "sra"
+
+
 rule all_trimgalore:
     input:
         expand("data/intermediate/trimgalore/{sample}/{sample}_val_1.fq.gz", sample=ALL_ILLUMINA_SAMPLES),
@@ -6,10 +14,20 @@ rule all_trimgalore:
         
 rule trimgalore:
     input:
-        read_1 = lambda wildcards: (illumina.loc[wildcards.sample, "R1"] if wildcards.sample in illumina.index else []),
-        read_2 = lambda wildcards: (illumina.loc[wildcards.sample, "R2"] if wildcards.sample in illumina.index else []),
-        sra_1 = lambda wc: (f"data/raw/sra/{wc.sample}/{wc.sample}_1.fastq.gz" if (wc.sample in sra.index and sra.loc[wc.sample, "tech"] == "illumina") else []),
-        sra_2 = lambda wc: (f"data/raw/sra/{wc.sample}/{wc.sample}_2.fastq.gz" if (wc.sample in sra.index and sra.loc[wc.sample, "tech"] == "illumina") else []),
+        read_1 = branch(
+            get_sample_file,
+            cases={
+                "illumina": lambda wildcards: illumina.loc[wildcards.sample, "R1"],
+                "sra": "data/raw/sra/{sample}/{sample}_1.fastq.gz"
+            }
+        ),
+        read_2 = branch(
+            get_sample_file,
+            cases={
+                "illumina": lambda wc: illumina.loc[wc.sample, "R2"],
+                "sra": "data/raw/sra/{sample}/{sample}_2.fastq.gz"
+            }
+        )
     output:
         trimmed_read1 = 'data/intermediate/trimgalore/{sample}/{sample}_val_1.fq.gz',
         trimmed_read2 = 'data/intermediate/trimgalore/{sample}/{sample}_val_2.fq.gz'
@@ -23,20 +41,12 @@ rule trimgalore:
         extra_params = config['trimgalore']['extra_params']
     shell:   
         """
-            if [[ "{input.read_1}" != "" && "{input.read_2}" != "" ]]; then
-                input_read_1="{input.read_1}"
-                input_read_2="{input.read_2}"
-            else
-                input_read_1="{input.sra_1}"
-                input_read_2="{input.sra_2}"
-            fi
-            
             trim_galore -o {params.output_dir} \
             -q {params.quality_cut} \
             --length {params.min_len} \
             --basename {wildcards.sample} \
             {params.extra_params} \
-            "$input_read_1" \
-            "$input_read_2" &> {log}
+            {input.read_1} \
+            {input.read_2} &> {log}
         """
 

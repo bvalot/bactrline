@@ -43,8 +43,8 @@ ILLUMINA_SAMPLES = samples.index.intersection(illumina.index)
 NANOPORE_SAMPLES = samples.index.intersection(nanopore.index)
 SRA_ILLUMINA_SAMPLES = samples.index.intersection(sra.index[sra["tech"] == "illumina"])
 SRA_NANOPORE_SAMPLES = samples.index.intersection(sra.index[sra["tech"] == "nanopore"])
-ALL_ILLUMINA_SAMPLES = set(ILLUMINA_SAMPLES + SRA_ILLUMINA_SAMPLES)
-ALL_NANOPORE_SAMPLES = set(NANOPORE_SAMPLES + SRA_NANOPORE_SAMPLES)
+ALL_ILLUMINA_SAMPLES = set(ILLUMINA_SAMPLES) | set (SRA_ILLUMINA_SAMPLES)
+ALL_NANOPORE_SAMPLES = set(NANOPORE_SAMPLES) | set(SRA_NANOPORE_SAMPLES)
 ASSEMBLED = samples.index.intersection(assembled.index)
 
 
@@ -54,5 +54,4 @@ samples.loc[samples.index.isin(NANOPORE_SAMPLES), "type"] = "nanopore"
 samples.loc[samples.index.isin(SRA_NANOPORE_SAMPLES), "type"] = "nanopore sra"
 samples.loc[samples.index.isin(ILLUMINA_SAMPLES), "type"] = "illumina"
 samples.loc[samples.index.isin(SRA_ILLUMINA_SAMPLES), "type"] = "illumina sra"
-
 
