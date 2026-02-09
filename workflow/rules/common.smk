@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from snakemake.utils import validate
 import os
 
@@ -48,7 +47,7 @@ ALL_NANOPORE_SAMPLES = set(NANOPORE_SAMPLES) | set(SRA_NANOPORE_SAMPLES)
 ASSEMBLED = samples.index.intersection(assembled.index)
 
 
-samples["type"] = np.nan
+samples["type"] = None
 samples.loc[samples.index.isin(ASSEMBLED), "type"] = "assembled"
 samples.loc[samples.index.isin(NANOPORE_SAMPLES), "type"] = "nanopore"
 samples.loc[samples.index.isin(SRA_NANOPORE_SAMPLES), "type"] = "nanopore sra"
