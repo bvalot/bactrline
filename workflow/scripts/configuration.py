@@ -54,7 +54,7 @@ species = input("Please indicate the full name of your species: ")
 
 info("Validate species on NCBI taxonomy")
 taxo = subprocess.run(["datasets", "summary", "taxonomy", "taxon", species], capture_output=True, text=True)
-if taxo.stderr == '':
+if 'Error' not in taxo.stderr:
     taxo = json.load(StringIO(taxo.stdout))
     count = taxo.get("total_count")
     if count != 1:
@@ -77,7 +77,7 @@ if taxid and ask("Do you want to download reference genome"):
     data = subprocess.run(["datasets", "download", "genome", "taxon", str(taxid), "--include",
                            "genome", "--reference", "--filename", tmpfi, "--no-progressbar"],
                           capture_output=True, text=True)
-    if data.stderr != '':
+    if 'Error' in data.stderr:
         info("Error during reference download", "\n" + data.stderr)
         shutil.rmtree(tmp.name)
         exit()
