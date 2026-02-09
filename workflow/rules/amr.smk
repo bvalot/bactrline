@@ -22,9 +22,8 @@ rule amrfinder:
             amrfinder -n {input.filtered_contig} \
             -o {output.amr_tsv} \
             --name {wildcards.sample} \
-            --log {log} \
-            -q \
-            {params.extra_params}
+            {params.extra_params} \
+	    &> {log}
             """)
         else:
             shell("""
@@ -33,8 +32,7 @@ rule amrfinder:
             --organism {params.species} \
             --name {wildcards.sample} \
             --plus \
-            --log {log} \
-            -q \
-            {params.extra_params}
+            {params.extra_params} \
+	    &> {log}	    
             """)
 
