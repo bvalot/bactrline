@@ -1,3 +1,13 @@
+def get_contig_file(wildcards):
+    sample = wildcards.sample
+    if samples.loc[sample, "type"] == "assembled":
+        return "assembled"
+    elif samples.loc[sample, "type"] == "nanopore" or samples.loc[sample, "type"] == "nanopore sra":
+        return "nanopore"
+    elif samples.loc[sample, "type"] == "illumina" or samples.loc[sample, "type"] == "illumina sra":
+        return "illumina"
+
+
 rule all_filter:
     input:
         expand('data/intermediate/filtered_contigs/{sample}.fasta', sample=samples.index)
@@ -5,7 +15,14 @@ rule all_filter:
 
 rule filter:
     input:
-        contigs_file = lambda wc: (f"data/intermediate/polishing/{wc.sample}/consensus.fasta" if wc.sample in ALL_NANOPORE_SAMPLES else f"data/intermediate/assembled/{wc.sample}_assembled/contigs.fasta")
+        contigs_file = branch(
+            get_contig_file,
+            cases={
+                "assembled": lambda wc : assembled.loc[wc.sample, "file"],
+                "nanopore": "data/intermediate/polishing/{sample}/consensus.fasta",
+                "illumina": "data/intermediate/assembled/{sample}_assembled/contigs.fasta"
+            }
+        )
     output:
         filtered_contigs_file = "data/intermediate/filtered_contigs/{sample}.fasta"
     log:
