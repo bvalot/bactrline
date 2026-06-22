@@ -8,8 +8,8 @@ def get_sample_file(wildcards):
 
 rule all_trimgalore:
     input:
-        expand("data/intermediate/trimgalore/{sample}/{sample}_val_1.fq.gz", sample=ALL_ILLUMINA_SAMPLES),
-        expand("data/intermediate/trimgalore/{sample}/{sample}_val_2.fq.gz", sample=ALL_ILLUMINA_SAMPLES)
+        expand("data/intermediate/illumina/trimgalore/{sample}/{sample}_val_1.fq.gz", sample=ALL_ILLUMINA_SAMPLES),
+        expand("data/intermediate/illumina/trimgalore/{sample}/{sample}_val_2.fq.gz", sample=ALL_ILLUMINA_SAMPLES)
         
         
 rule trimgalore:
@@ -29,13 +29,13 @@ rule trimgalore:
             }
         )
     output:
-        trimmed_read1 = 'data/intermediate/trimgalore/{sample}/{sample}_val_1.fq.gz',
-        trimmed_read2 = 'data/intermediate/trimgalore/{sample}/{sample}_val_2.fq.gz'
-    log: "logs/trimgalore/{sample}.log"
+        trimmed_read1 = 'data/intermediate/illumina/trimgalore/{sample}/{sample}_val_1.fq.gz',
+        trimmed_read2 = 'data/intermediate/illumina/trimgalore/{sample}/{sample}_val_2.fq.gz'
+    log: "logs/illumina/trimgalore/{sample}.log"
     conda:
         "../envs/trimgalore.yml"
     params:
-        output_dir = "data/intermediate/trimgalore/{sample}/",
+        output_dir = "data/intermediate/illumina/trimgalore/{sample}/",
         min_len = config['trimgalore']['minimum_length'],
         quality_cut = config['trimgalore']['quality_cutoff'],
         extra_params = config['trimgalore']['extra_params']

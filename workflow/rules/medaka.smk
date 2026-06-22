@@ -1,25 +1,27 @@
 rule all_medaka:
     input:
-        expand("data/intermediate/polishing/{sample}/consensus.fasta", sample=ALL_NANOPORE_SAMPLES)
+        expand("data/intermediate/" + TECH + "/polishing/{sample}/consensus.fasta", sample=ALL_NANOPORE_SAMPLES),
+
 
 
 rule medaka:
     input:
-        trim_read = "data/intermediate/filtlong/{sample}.fastq.gz",
-        contigs_file = "data/intermediate/flye/{sample}/assembly.fasta"
+        trim_read = "data/intermediate/" + TECH + "/filtlong/{sample}.fastq.gz",
+        contigs_file = "data/intermediate/" + TECH + "/flye/{sample}/assembly.fasta"
     output:
-        polished_contigs_file = "data/intermediate/polishing/{sample}/consensus.fasta"
+        polished_contigs_file = "data/intermediate/" + TECH + "/polishing/{sample}/consensus.fasta"
     conda:
         "../envs/medaka.yml"
     threads: config['resources']['threads']
     resources:
         mem_mb = config['resources']['mem_mb']
-    log: "logs/polishing/{sample}.log"
+    log: "logs/" + TECH + "/polishing/{sample}.log"
     params:
+        output_dir = "data/intermediate/" + TECH + "/polishing/{sample}",
         extra_params = config['medaka']['extra_params']
     shell:
         """
             medaka_consensus {params.extra_params} -i {input.trim_read} \
             -d {input.contigs_file} -t {threads} -f \
-            -o data/intermediate/polishing/{wildcards.sample} &> {log}
+            -o {params.output_dir} &> {log}
         """

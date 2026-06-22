@@ -10,7 +10,8 @@ def get_contig_file(wildcards):
 
 rule all_filter:
     input:
-        expand('data/intermediate/filtered_contigs/{sample}.fasta', sample=samples.index)
+        expand('data/intermediate/' + TECH + '/filtered_contigs/{sample}.fasta', sample=samples.index),
+
 
 
 rule filter:
@@ -19,16 +20,16 @@ rule filter:
             get_contig_file,
             cases={
                 "assembled": lambda wc : assembled.loc[wc.sample, "file"],
-                "nanopore": "data/intermediate/polishing/{sample}/consensus.fasta",
-                "illumina": "data/intermediate/assembled/{sample}_assembled/contigs.fasta"
+                "nanopore": "data/intermediate/" + TECH + "/polishing/{sample}/consensus.fasta",
+                "illumina": "data/intermediate/" + TECH + "/assembled/{sample}_assembled/contigs.fasta"
             }
         )
     output:
-        filtered_contigs_file = "data/intermediate/filtered_contigs/{sample}.fasta"
+        filtered_contigs_file = "data/intermediate/" + TECH + "/filtered_contigs/{sample}.fasta"
     log:
-        "logs/filter_contig/{sample}.log"
+        "logs/" + TECH + "/filter_contig/{sample}.log"
     params:
-        info_file = "data/intermediate/flye/{sample}/assembly_info.txt",
+        info_file = "data/intermediate/nanopore/flye/{sample}/assembly_info.txt",
         cov_contig = config['filter_contigs']['coverage'],
         len_contig = config['filter_contigs']['length']
     script:

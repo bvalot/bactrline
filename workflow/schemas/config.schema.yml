@@ -27,11 +27,17 @@ properties:
       plasmid_tool:
         type: string
         description: tools used to detect plasmid
+      tech:
+        type: string
+        enum: ['illumina', 'nanopore', 'assembled']
+        description: sequencing technology for this run
     required:
       - reference
       - kraken_db_path
       - pymlst_db
       - genome_size
+      - tech
+
 
   resources:
     type: object

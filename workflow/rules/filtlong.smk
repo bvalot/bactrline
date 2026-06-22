@@ -1,28 +1,20 @@
-def get_nanopore_file(wildcards):
-    sample = wildcards.sample
-    if samples.loc[sample, "type"] == "nanopore":
-        return "nanopore"
-    elif samples.loc[sample, "type"] == "nanopore sra":
-        return "sra"
-
-
 rule all_filtlong:
     input:
-        expand("data/intermediate/filtlong/{sample}.fastq.gz", sample=ALL_NANOPORE_SAMPLES)
+        expand("data/intermediate/" + TECH + "/filtlong/{sample}.fastq.gz", sample=ALL_NANOPORE_SAMPLES)
         
         
 rule filtlong:
     input:
-        branch(
+        raw_read = branch(
             get_nanopore_file,
             cases={
                 "nanopore": lambda wc: nanopore.loc[wc.sample, "folder/file"],
-                "sra": "data/raw/sra/{sample}/{sample}.fastq.gz"
+                "sra": "data/raw/sra/" + TECH + "/{sample}/{sample}.fastq.gz"
             }
         )
     output:
-        trim_read = "data/intermediate/filtlong/{sample}.fastq.gz"
-    log: "logs/filtlong/{sample}.log"
+        trim_read = "data/intermediate/" + TECH + "/filtlong/{sample}.fastq.gz"
+    log: "logs/" + TECH + "/filtlong/{sample}.log"
     conda:
         "../envs/filtlong.yml"
     params:
@@ -31,7 +23,8 @@ rule filtlong:
         extra_params = config['filtlong']['extra_params']
     shell:
         """
-        read_path="${{input_read%/}}"
+        read_path="{input.raw_read}"
+        read_path="${{read_path%/}}"
         if [ -d "$read_path" ]; then
 		    if [ ! -d "data/raw/nanopore/" ]; then
 			    mkdir -p data/raw/nanopore/

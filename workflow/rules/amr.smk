@@ -1,18 +1,19 @@
 rule all_amrfinder: 
     input:
-        expand("data/intermediate/amr/{sample}_AMR.tsv", sample=samples.index)
+        expand("data/intermediate/" + TECH + "/amr/{sample}_AMR.tsv", sample=samples.index),
+
 
 
 rule amrfinder:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        filtered_contig = "data/intermediate/" + TECH + "/filtered_contigs/{sample}.fasta",
         setup = "resources/database/amr/amrfinder.setup"
     output:
-        amr_tsv = "data/intermediate/amr/{sample}_AMR.tsv"
+        amr_tsv = "data/intermediate/" + TECH + "/amr/{sample}_AMR.tsv"
     conda:
         "../envs/amrfinder.yml"
     log: 
-        "logs/amr/{sample}.log" 
+        "logs/" + TECH + "/amr/{sample}.log" 
     params:
         species = config['amrfinder']['species'],
         extra_params = config['amrfinder']['extra_params']

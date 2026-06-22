@@ -13,15 +13,22 @@ include: "rules/install.smk"
 include: "rules/common.smk"
 include: "rules/sra.smk"
 include: "rules/trimgalore.smk"
+include: "rules/fastqc.smk"
 include: "rules/filtlong.smk"
+include: "rules/nanoplot.smk"
 include: "rules/subsample.smk"
 include: "rules/assembly.smk"
 include: "rules/flye.smk"
 include: "rules/medaka.smk"
 include: "rules/filter_contigs.smk"
+include: "rules/kraken.smk"
+include: "rules/quast.smk"
+include: "rules/checkm2.smk"
 include: "rules/quality.smk"
 include: "rules/amr.smk"
 include: "rules/pymlst.smk"
+include: "rules/annotation.smk"
+include: "rules/multiqc.smk"
 
 if PLASMID == 'platon' or PLASMID == 'platon,plasclass':
     include: "rules/platon.smk"
@@ -35,14 +42,14 @@ if SPECIES == 'Escherichia coli':
     include: "rules/clermontyping.smk"
     include: "rules/fimtyping.smk"
 
-include: "rules/annotation.smk"
+
+
 
 
 ### TARGET RULES ###
 
 rule all:
     input :
-        "results/quality_report.tsv",
-        "results/annotation_report.tsv",
-        "results/gene_amr_summary.tsv"
-        
+        "results/" + TECH + "/report/quality_report.tsv",
+        "results/" + TECH + "/report/annotation_report.tsv",
+        "results/" + TECH + "/report/gene_amr_summary.tsv",

@@ -71,6 +71,8 @@ configuration:
   genome_size: 2800000                   # Estimated genome size in bp
   species: 'Staphylococcus aureus'       # Name of the species
   plasmid_tool: 'platon,plasclass'       # Plasmid detection tools to use : 'platon', 'plasclass', both ('platon,plasclass') or leave empty
+  tech: 'nanopore, illumina'             # Select the sequencing platform used to generate your reads. Use nanopore for long-read data (Oxford Nanopore Technologies) 
+  					 # or illumina for short-read data (Illumina NGS)
 ```
 
 > Important: If you are analyzing data from *E. coli* or *S. aureus*, make sure to use the correct formatting in the species field: 'Escherichia coli' or 'Staphylococcus aureus'.
@@ -105,10 +107,11 @@ For the pipeline, you need to provide a reference genome. You can place it in a 
 
 #### 4. Configuration file option
 
-You can change the resources maximal that can be used by certain rules with `threads` : the number of threads, and `mem_mb` : RAM in MB. \
+You can change the resources maximal that can be used by certain rules with `threads` : the number of threads, and `mem_mb` : RAM in MB. 
 You can add any parameters you like to `extra_params` for each tool.
 > We recommend using the `--memory-mapping` option for Kraken2 if you have 16GB RAM or less.
-
+You can adjust the `threads` option to suit your CheckM analysis.
+> If your system has 16 GB of RAM or less, we recommend limiting threads to 2 when running CheckM.
 
 #### 5. Installation of databases
 
@@ -124,10 +127,10 @@ You can download the Kraken2 and Platon databases manually by following the step
 
 ```
 # Kraken2 database
-wget -P resources/database https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16gb_20250402.tar.gz
-mkdir -p resources/database/k2_standard_16gb_20250402
-tar -xzf resources/database/k2_standard_16gb_20250402.tar.gz -C resources/database/k2_standard_16gb_20250402
-rm resources/database/k2_standard_16gb_20250402.tar.gz
+wget -P resources/database https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16_GB_20260226.tar.gz
+mkdir -p resources/database/k2_standard_16_GB_20260226
+tar -xzf resources/database/k2_standard_16_GB_20260226.tar.gz -C resources/database/k2_standard_16_GB_20260226
+rm resources/database/k2_standard_16_GB_20260226.tar.gz
 ```
 
 ```
@@ -152,6 +155,12 @@ snakemake --conda-create-envs-only --use-conda
 
 
 ### Usage
+
+Before running the core pipeline, check your FASTQ data quality at two stages: before and after trimming.
+
+```
+snakemake all_qc --use-conda
+```
 
 Before running the pipeline, you can check that everything is working correctly using `--dry-run option`:
 

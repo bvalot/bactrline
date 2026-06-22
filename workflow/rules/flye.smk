@@ -1,21 +1,22 @@
 rule all_flye:
     input:
-        expand("data/intermediate/contigs/{sample}.fasta", sample=ALL_NANOPORE_SAMPLES)
+        expand("data/intermediate/" + TECH + "/flye/{sample}/assembly.fasta", sample=ALL_NANOPORE_SAMPLES),
+
         
         
 rule flye:
     input:
-        trim_read = "data/intermediate/filtlong/{sample}.fastq.gz"
+        trim_read = "data/intermediate/" + TECH + "/filtlong/{sample}.fastq.gz"
     output:
-        contig_file = "data/intermediate/flye/{sample}/assembly.fasta"
+        contig_file = "data/intermediate/" + TECH + "/flye/{sample}/assembly.fasta"
     threads: config['resources']['threads']
     resources:
         mem_mb = config['resources']['mem_mb']
-    log: "logs/flye/{sample}.log"
+    log: "logs/" + TECH + "/flye/{sample}.log"
     conda:
         "../envs/flye.yml"
     params:
-        output_dir = "data/intermediate/flye/{sample}/",
+        output_dir = "data/intermediate/" + TECH + "/flye/{sample}/",
         extra_params = config['flye']['extra_params']
     shell:   
         """

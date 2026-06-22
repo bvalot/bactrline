@@ -4,6 +4,10 @@ import os
 
 validate(config, "../schemas/config.schema.yml")
 
+
+# Technology for this run (single-tech pipeline: 'illumina' or 'nanopore')
+TECH = config['configuration']['tech']
+
 # load table
 samples = pd.read_csv("config/samplesheet.tsv", sep="\t").set_index("ID", drop=False)
 samples.index = samples.index.astype(str)
@@ -53,4 +57,28 @@ samples.loc[samples.index.isin(NANOPORE_SAMPLES), "type"] = "nanopore"
 samples.loc[samples.index.isin(SRA_NANOPORE_SAMPLES), "type"] = "nanopore sra"
 samples.loc[samples.index.isin(ILLUMINA_SAMPLES), "type"] = "illumina"
 samples.loc[samples.index.isin(SRA_ILLUMINA_SAMPLES), "type"] = "illumina sra"
+
+
+def get_nanopore_file(wildcards):
+    """Return the source type ('nanopore' local or 'sra') for a Nanopore sample.
+    Used with Snakemake's branch() to route inputs in filtlong and nanoplot rules.
+    """
+    sample = wildcards.sample
+    if samples.loc[sample, "type"] == "nanopore":
+        return "nanopore"
+    elif samples.loc[sample, "type"] == "nanopore sra":
+        return "sra"
+
+
+def qc_report():
+    """
+    Return the MultiQC report path ONLY if explicitly requested.
+    Currently disabled (returns []) so that downstream all_* rules
+    do NOT auto-trigger the full QC chain. To get the QC report, run:
+        snakemake all_qc --use-conda
+    To re-enable auto-triggering, restore the body:
+        if len(ALL_ILLUMINA_SAMPLES) > 0 or len(ALL_NANOPORE_SAMPLES) > 0:
+            return ["results/multiqc_report.html"]
+    """
+    return []
 

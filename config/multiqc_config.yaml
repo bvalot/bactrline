@@ -1,0 +1,81 @@
+## MultiQC Configuration — optimized for bacterial WGS data
+
+report_header_info:
+  - Pipeline: "bactrline"
+  - Description: "Quality control report: raw vs trimmed/filtered reads (bacterial WGS)"
+  - Note: "For bacterial data, high duplication rates and GC bias are EXPECTED and not a quality issue."
+
+title: "BactrLine QC Report"
+subtitle: "Bacterial WGS — Raw vs trimmed/filtered reads"
+
+# Modules activated (MultiQC auto-detects what is present in scanned dirs)
+run_modules:
+  - fastqc
+  - nanostat
+
+# Module ordering: raw before trimmed/filtered
+module_order:
+  - fastqc:
+      name: "FastQC: Raw reads"
+      anchor: "fastqc_raw"
+      path_filters:
+        - "*/fastqc_raw/*"
+  - fastqc:
+      name: "FastQC: Trimmed reads"
+      anchor: "fastqc_trimmed"
+      path_filters:
+        - "*/fastqc_trimmed/*"
+  - nanostat:
+      name: "NanoPlot: Raw reads"
+      anchor: "nanoplot_raw"
+      path_filters:
+        - "*/nanoplot_raw/*"
+  - nanostat:
+      name: "NanoPlot: Filtered reads"
+      anchor: "nanoplot_filtered"
+      path_filters:
+        - "*/nanoplot_filtered/*"
+
+# Clean up sample names
+fn_clean_exts:
+  - "_R1_001_fastqc"
+  - "_R2_001_fastqc"
+  - "_R1_fastqc"
+  - "_R2_fastqc"
+  - "_val_1_fastqc"
+  - "_val_2_fastqc"
+  - "_NanoStats"
+  - ".fq.gz"
+  - ".fastq.gz"
+
+fn_clean_trim:
+  - "data/intermediate/illumina/fastqc_raw/"
+  - "data/intermediate/illumina/fastqc_trimmed/"
+  - "data/intermediate/nanopore/nanoplot_raw/"
+  - "data/intermediate/nanopore/nanoplot_filtered/"
+
+
+table_columns_visible:
+  General Statistics:
+    nanostat-Median_read_length_fastq: True
+    nanostat-Read_length_N50_fastq: True
+    nanostat-Number_of_reads_fastq: True
+    nanostat-Total_bases_fastq: True
+    nanostat-Mean_read_quality_fastq: True
+
+
+# Status checks — keep true to see all warnings
+fastqc_config:
+  status_checks: true
+
+# Interpretation notes shown in report
+section_comments:
+  fastqc_raw: |
+    <strong>Expected warnings for bacterial WGS:</strong>
+    Per-base sequence content warnings on first 10-15 bp (random hexamer priming bias) are normal.
+    GC distribution warnings are expected since bacterial GC varies 25-75% (E. coli ~50%, S. aureus ~33%, P. aeruginosa ~66%).
+    High duplication rates are expected for high-coverage bacterial samples (small genome + many reads = natural duplicates).
+    Focus on per-base quality, adapter content, and N content for real quality issues.
+  fastqc_trimmed: |
+    After TrimGalore, adapter content should be resolved and per-base quality improved.
+    Other warnings (duplication, GC, sequence content) may persist but are expected for bacterial data.

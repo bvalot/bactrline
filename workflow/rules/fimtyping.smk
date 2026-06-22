@@ -1,14 +1,15 @@
 rule all_fimtyping:
     input:
-        expand("data/intermediate/fimtyping/{sample}_FIM.tsv", sample=samples.index)
+        expand("data/intermediate/" + TECH + "/fimtyping/{sample}_FIM.tsv", sample=samples.index),
+
 
 
 rule fimtyping:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta"
+        filtered_contig = "data/intermediate/" + TECH + "/filtered_contigs/{sample}.fasta"
     output:
-        fimtyping_tsv = "data/intermediate/fimtyping/{sample}_FIM.tsv"
-    log: "logs/fimtyping/{sample}.log"
+        fimtyping_tsv = "data/intermediate/" + TECH + "/fimtyping/{sample}_FIM.tsv"
+    log: "logs/" + TECH + "/fimtyping/{sample}.log"
     params:
         extra_params = config['fimtyping']['extra_params']
     conda:

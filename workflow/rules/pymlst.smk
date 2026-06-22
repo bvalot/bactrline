@@ -1,17 +1,18 @@
 rule all_pymlst:
     input:
-        expand("data/intermediate/pymlst/{sample}_MLST.tsv", sample=samples.index)
+        expand("data/intermediate/" + TECH + "/pymlst/{sample}_MLST.tsv", sample=samples.index),
+
 
 
 rule pymlst:
     input:
-        filtered_contig = "data/intermediate/filtered_contigs/{sample}.fasta",
+        filtered_contig = "data/intermediate/" + TECH + "/filtered_contigs/{sample}.fasta",
         database = config['configuration']['pymlst_db']
     output:
-        pymlst_file = "data/intermediate/pymlst/{sample}_MLST.tsv"
+        pymlst_file = "data/intermediate/" + TECH + "/pymlst/{sample}_MLST.tsv"
     conda:
         "../envs/pymlst.yml"
-    log: "logs/pymlst/{sample}.log"
+    log: "logs/" + TECH + "/pymlst/{sample}.log"
     params:
         identity = config['pymlst']['min_identity'],
         coverage = config['pymlst']['min_coverage'],

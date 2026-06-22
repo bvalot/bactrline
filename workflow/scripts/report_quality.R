@@ -86,7 +86,7 @@ for (file in files_list_quast) {
     
     # Extracting the sample name from the directory name
     path <- sub("/transposed_report.tsv", "", file)
-    sample_name <- sub("data/intermediate/quast/", "", path)
+    sample_name <- basename(path)
     
     # Selection of columns to keep
     col_to_keep <- c("# contigs (>= 0 bp)", "Total length (>= 0 bp)", "Largest contig", "Reference length", "GC (%)", "Reference GC (%)", "N50", "L50")
@@ -123,7 +123,7 @@ for (file in files_list_checkm) {
     
     # Extracting the sample name from the directory name
     path <- sub("/quality_report.tsv", "", file)
-    sample_name <- sub("data/intermediate/checkm2/", "", path)
+    sample_name <- basename(path)
     
     # Selection of columns to keep
     cols_to_keep <- c("Completeness", "Contamination")
