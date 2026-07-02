@@ -1,11 +1,13 @@
 # bactRline : Pipeline for bacterial genomes assembly and characterization
 
+<p align="center"><img src="img/bactrline_logo.png" title="bactRline"></p>
+
 ## Contents
 
 ### Summary
 
 **bactRline** is a Snakemake-based workflow for the assembly and characterization of bacterial genomes from whole-genome sequencing (WGS) data. It automates the processing of raw sequencing reads through quality control, assembly, and annotation steps.
-We have provided a step-by-step description of how to set up the working environment and the configuration to run it. We recommend that you read the instructions below carefully to obtain the desired results. \
+We have provided a step-by-step description of how to set up the working environment and the configuration to run it. We recommend that you read the instructions below carefully to obtain the desired results.
 
 Tools Used:
   * Pre-processing: TrimGalore, Filtlong
