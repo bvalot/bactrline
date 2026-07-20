@@ -1,8 +1,8 @@
 rule all_flye:
     input:
-        expand("data/intermediate/contigs/{sample}.fasta", sample=ALL_NANOPORE_SAMPLES)
-        
-        
+        expand("data/intermediate/flye/{sample}/assembly.fasta", sample=ALL_NANOPORE_SAMPLES)
+
+
 rule flye:
     input:
         trim_read = "data/intermediate/filtlong/{sample}.fastq.gz"

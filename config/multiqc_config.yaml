@@ -1,0 +1,147 @@
+## MultiQC Configuration — optimized for bacterial WGS data
+
+report_header_info:
+  - Pipeline: "bactrline"
+  - Description: "Quality control report: raw vs trimmed/filtered reads (bacterial WGS)"
+  - Note: "For bacterial data, high duplication rates and GC bias are EXPECTED and not a quality issue."
+
+title: "BactrLine QC Report"
+subtitle: "Bacterial WGS — Raw vs trimmed/filtered reads"
+
+run_modules:
+  - fastqc
+  - nanostat
+
+module_order:
+  - fastqc:
+      name: "FastQC: Raw reads"
+      anchor: "fastqc_raw"
+      info: "Quality of raw Illumina reads before trimming"
+      path_filters:
+        - "*QC_raw*"
+      is_module: true
+
+  - fastqc:
+      name: "FastQC: Trimmed reads"
+      anchor: "fastqc_trimmed"
+      info: "Quality of trimmed Illumina reads after TrimGalore"
+      path_filters:
+        - "*QC_trimmed*"
+      is_module: true
+
+  - nanostat:
+      name: "NanoStat: Raw reads"
+      anchor: "nanostat_raw"
+      info: "Quality of raw Nanopore reads before filtering"
+      path_filters:
+        - "*QC_raw*"
+      is_module: true
+
+  - nanostat:
+      name: "NanoStat: Filtered reads"
+      anchor: "nanostat_filtered"
+      info: "Quality of filtered Nanopore reads after Filtlong"
+      path_filters:
+        - "*QC_trimmed*"
+      is_module: true
+
+# ---------------------------------------------------------------
+# Nettoyage des noms d'échantillons
+#
+# Stratégie NanoStat :
+#   _raw_NanoStats   → _raw    (ex: FBF01300_raw)
+#   _filtered_NanoStats → _flt (ex: FBF01300_flt)
+#
+# "flt" est alphabétiquement après "raw" → ordre garanti :
+#   FBF01300_raw
+#   FBF01300_flt
+#   ecoli_SRR10971019_raw
+#   ecoli_SRR10971019_flt
+#
+# Stratégie FastQC :
+#   _R1_001 / _R2_001 / _val_1 / _val_2 supprimés
+#   → une seule ligne par échantillon Illumina
+# ---------------------------------------------------------------
+
+fn_clean_exts:
+  - "_R1_001_fastqc"
+  - "_R2_001_fastqc"
+  - "_val_1_fastqc"
+  - "_val_2_fastqc"
+  - "_NanoStats"
+  - ".fq.gz"
+  - ".fastq.gz"
+
+fn_clean_trim:
+  - "data/intermediate/QC_raw/"
+  - "data/intermediate/QC_trimmed/"
+  - "QC_raw/"
+  - "QC_trimmed/"
+
+# _raw conservé tel quel, _filtered renommé en _flt pour trier après _raw
+sample_names_replace:
+  "_R1_001$": ""
+  "_R2_001$": ""
+  "_val_1$": ""
+  "_val_2$": ""
+  "_raw$": "_1_raw"
+  "_filtered$": "_2_flt"
+
+# ---------------------------------------------------------------
+# General Statistics — colonnes FastQC
+# ---------------------------------------------------------------
+table_columns_visible:
+  General Statistics:
+    fastqc-total_sequences: True
+    fastqc-avg_sequence_length: True
+    fastqc-percent_gc: True
+    fastqc-percent_duplicates: True
+
+# ---------------------------------------------------------------
+# General Statistics — colonnes NanoStat
+# ---------------------------------------------------------------
+general_stats_columns:
+  nanostat:
+    columns:
+      Number of reads_fastq:
+        title: "# Reads"
+        description: "Number of reads (Nanopore)"
+        hidden: false
+      Total bases_fastq:
+        title: "Total Bases"
+        description: "Total bases sequenced (Nanopore)"
+        hidden: false
+      Read length N50_fastq:
+        title: "Read N50"
+        description: "Read length N50 (Nanopore)"
+        hidden: false
+      Median read length_fastq:
+        title: "Median Len"
+        description: "Median read length (Nanopore)"
+        hidden: false
+      Median read quality_fastq:
+        title: "Median Qual"
+        description: "Median read quality Phred score (Nanopore)"
+        hidden: false
+      Mean read quality_fastq:
+        title: "Mean Qual"
+        description: "Mean read quality Phred score (Nanopore)"
+        hidden: false
+
+fastqc_config:
+  status_checks: true
+
+section_comments:
+  fastqc: |
+    <strong>Avertissements attendus pour du WGS bactérien :</strong>
+    Les warnings sur le contenu en bases des 10-15 premiers pb sont normaux (biais d'amorçage hexamère aléatoire).
+    Les warnings sur la distribution GC sont attendus (GC bactérien : 25-75 % selon l'espèce).
+    Les forts taux de duplication sont attendus à haute couverture sur petit génome.
+    Concentrez-vous sur la qualité par base, le contenu en adaptateurs et le contenu en N.
+
+  nanostat: |
+    <strong>Métriques NanoStat pour les lectures Nanopore :</strong>
+    Les lignes suffixées <em>_1_raw</em> correspondent aux lectures avant filtrage (Filtlong).
+    Les lignes suffixées <em>_2_flt</em> correspondent aux lectures après filtrage.
+    Pour le WGS bactérien, les lectures longues (>10 kb) sont préférables pour l'assemblage.
+    Les Q-scores indiquent la précision de l'appel de bases.
