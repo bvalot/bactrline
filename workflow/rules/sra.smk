@@ -42,7 +42,7 @@ rule sra_nanopore:
     shell:
         """
         fasterq-dump {params.sra_file} \
-        --split-files \
+        --force \
         --outdir {params.out_dir} > {log} 2>&1
         
         gzip -5 -c {params.out_dir}{params.sra_file}.fastq > {output.fastq_file}

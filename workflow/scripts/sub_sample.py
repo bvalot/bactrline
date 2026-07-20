@@ -8,6 +8,7 @@ import gzip
 import io
 import os
 import random
+import subprocess
 import sys
 
 import pysam
@@ -79,15 +80,15 @@ def outname(inname, outdir, append):
     inname = outdir + inname.split("/")[-1]
     if isgzip(inname):
         if inname[-5:] == "fq.gz":
-            return inname.rstrip(".fq.gz") + append + ".fastq.gz"
+            return inname[: -len(".fq.gz")] + append + ".fastq.gz"
         elif inname[-8:] == "fastq.gz":
-            return inname.rstrip(".fastq.gz") + append + ".fastq.gz"
+            return inname[: -len(".fastq.gz")] + append + ".fastq.gz"
         else:
             return inname + append + ".fastq.gz"
     elif inname[-2:] == "fq":
-        return inname.rstrip(".fq") + append + ".fastq.gz"
+        return inname[: -len(".fq")] + append + ".fastq.gz"
     elif inname[-5:] == "fastq":
-        return inname.rstrip(".fastq") + append + ".fastq.gz"
+        return inname[: -len(".fastq")] + append + ".fastq.gz"
     else:
         return inname + append + ".fastq.gz"
 
@@ -110,7 +111,7 @@ def complet_count(fastq):
 
 def make_copy(infile, outdir, prefix):
     output = outname(infile, outdir, prefix)
-    os.popen(" ".join(["cp", infile, output]))
+    subprocess.run(["cp", infile, output], check=True)
 
 
 def make_subsampling(infile, outdir, prefix, select):
