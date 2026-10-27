@@ -46,7 +46,6 @@ quality:
   warning_species_percent: 95
   error_species_percent: 90
   checkm:
-    threads: 2  
     extra_params: ''
   kraken:
     extra_params: ''

@@ -109,7 +109,7 @@ For the pipeline, you need to provide a reference genome. You can place it in a 
 
 You can change the resources maximal that can be used by certain rules with `threads` : the number of threads, and `mem_mb` : RAM in MB. \
 You can add any parameters you like to `extra_params` for each tool.
-> We recommend using the `--memory-mapping` option for Kraken2 if you have 16GB RAM or less.
+> We recommend using the `--memory-mapping` option for Kraken2 and `--lowmem` option for checkm2 if you have 16GB RAM or less.
 
 
 #### 5. Installation of databases

@@ -12,7 +12,7 @@ rule checkm2:
         database = config['configuration']['checkm2_db']
     output:
         checkm_log = "data/intermediate/checkm2/{sample}/quality_report.tsv"
-    threads: config['quality']['checkm']['threads'] #config['resources']['threads']
+    threads: config['resources']['threads']
     resources:
         mem_mb = config['resources']['mem_mb']
     log: "logs/checkm2/{sample}.log"
