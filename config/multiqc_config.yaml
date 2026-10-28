@@ -1,4 +1,5 @@
-## MultiQC Configuration — optimized for bacterial WGS data
+## MultiQC Configuration — optimized for bacterial WGS data (bactrline)
+## Tested with MultiQC v1.35
 
 report_header_info:
   - Pipeline: "bactrline"
@@ -12,93 +13,63 @@ run_modules:
   - fastqc
   - nanostat
 
+# ---------------------------------------------------------------
+# Illumina: ONE single FastQC module (raw + trimmed together)
+#   -> a single set of columns (% Dups, % GC...) in General Statistics
+#   -> raw and trimmed curves are overlaid in each plot
+# Nanopore: two NanoStat sections (raw / filtered)
+# ---------------------------------------------------------------
 module_order:
   - fastqc:
-      name: "FastQC: Raw reads"
-      anchor: "fastqc_raw"
-      info: "Quality of raw Illumina reads before trimming"
-      path_filters:
-        - "*QC_raw*"
-      is_module: true
-
-  - fastqc:
-      name: "FastQC: Trimmed reads"
-      anchor: "fastqc_trimmed"
-      info: "Quality of trimmed Illumina reads after TrimGalore"
-      path_filters:
-        - "*QC_trimmed*"
-      is_module: true
+      name: "FastQC: Raw vs Trimmed reads"
+      info: "Illumina reads before (_R1_001/_R2_001) and after TrimGalore (_val_1/_val_2)"
 
   - nanostat:
       name: "NanoStat: Raw reads"
       anchor: "nanostat_raw"
       info: "Quality of raw Nanopore reads before filtering"
       path_filters:
-        - "*QC_raw*"
-      is_module: true
+        - "*_raw_NanoStats.txt"
 
   - nanostat:
       name: "NanoStat: Filtered reads"
       anchor: "nanostat_filtered"
       info: "Quality of filtered Nanopore reads after Filtlong"
       path_filters:
-        - "*QC_trimmed*"
-      is_module: true
+        - "*_filtered_NanoStats.txt"
 
 # ---------------------------------------------------------------
-# Nettoyage des noms d'échantillons
+# Sample name cleaning
 #
-# Stratégie NanoStat :
-#   _raw_NanoStats   → _raw    (ex: FBF01300_raw)
-#   _filtered_NanoStats → _flt (ex: FBF01300_flt)
-#
-# "flt" est alphabétiquement après "raw" → ordre garanti :
-#   FBF01300_raw
-#   FBF01300_flt
-#   ecoli_SRR10971019_raw
-#   ecoli_SRR10971019_flt
-#
-# Stratégie FastQC :
-#   _R1_001 / _R2_001 / _val_1 / _val_2 supprimés
-#   → une seule ligne par échantillon Illumina
+# FastQC takes the sample name from the "Filename" field of the report:
+#   ecoli_SRR001666_R1_001.fastq.gz  (raw)
+#   ecoli_SRR001666_val_1.fq.gz      (trimmed)
+# Only file extensions are removed; _R1_001 / _val_1 are kept
+# (otherwise R1 and R2 are merged and the link to the file is lost).
 # ---------------------------------------------------------------
-
 fn_clean_exts:
-  - "_R1_001_fastqc"
-  - "_R2_001_fastqc"
-  - "_val_1_fastqc"
-  - "_val_2_fastqc"
-  - "_NanoStats"
-  - ".fq.gz"
   - ".fastq.gz"
+  - ".fq.gz"
+  - ".fastq"
+  - ".fq"
+  - "_fastqc"
+  - "_NanoStats"
 
-fn_clean_trim:
-  - "data/intermediate/QC_raw/"
-  - "data/intermediate/QC_trimmed/"
-  - "QC_raw/"
-  - "QC_trimmed/"
-
-# _raw conservé tel quel, _filtered renommé en _flt pour trier après _raw
-sample_names_replace:
-  "_R1_001$": ""
-  "_R2_001$": ""
-  "_val_1$": ""
-  "_val_2$": ""
-  "_raw$": "_1_raw"
-  "_filtered$": "_2_flt"
-
-# ---------------------------------------------------------------
-# General Statistics — colonnes FastQC
-# ---------------------------------------------------------------
-table_columns_visible:
-  General Statistics:
-    fastqc-total_sequences: True
-    fastqc-avg_sequence_length: True
-    fastqc-percent_gc: True
-    fastqc-percent_duplicates: True
+# Illumina: ORIGINAL names kept (= fastq file name without extension)
+# Alphabetical sorting already puts raw before trimmed (R < v):
+#   ecoli_SRR001666_R1_001   -> data/.../ecoli_SRR001666_R1_001.fastq.gz
+#   ecoli_SRR001666_R2_001
+#   ecoli_SRR001666_val_1    -> TrimGalore output ecoli_SRR001666_val_1.fq.gz
+#   ecoli_SRR001666_val_2
+#
+# Nanopore: ORIGINAL names kept (no renaming)
+#   FBF01300_raw       <- FBF01300_raw_NanoStats.txt
+#   FBF01300_filtered  <- FBF01300_filtered_NanoStats.txt
+# NB: General Statistics sorts rows alphabetically, so
+#     _filtered appears above _raw.
 
 # ---------------------------------------------------------------
-# General Statistics — colonnes NanoStat
+# General Statistics — NanoStat columns
 # ---------------------------------------------------------------
 general_stats_columns:
   nanostat:
@@ -133,15 +104,16 @@ fastqc_config:
 
 section_comments:
   fastqc: |
-    <strong>Avertissements attendus pour du WGS bactérien :</strong>
-    Les warnings sur le contenu en bases des 10-15 premiers pb sont normaux (biais d'amorçage hexamère aléatoire).
-    Les warnings sur la distribution GC sont attendus (GC bactérien : 25-75 % selon l'espèce).
-    Les forts taux de duplication sont attendus à haute couverture sur petit génome.
-    Concentrez-vous sur la qualité par base, le contenu en adaptateurs et le contenu en N.
+    <strong>Rows <em>_R1_001 / _R2_001</em> = raw reads, <em>_val_1 / _val_2</em> = after TrimGalore (names = original fastq files).</strong>
+    Expected warnings for bacterial WGS:
+    warnings on per-base sequence content in the first 10-15 bp are normal (random hexamer priming bias);
+    warnings on GC distribution are expected (bacterial GC: 25-75 % depending on species);
+    high duplication rates are expected at high coverage on a small genome.
+    Focus on per-base quality, adapter content and N content.
 
   nanostat: |
-    <strong>Métriques NanoStat pour les lectures Nanopore :</strong>
-    Les lignes suffixées <em>_1_raw</em> correspondent aux lectures avant filtrage (Filtlong).
-    Les lignes suffixées <em>_2_flt</em> correspondent aux lectures après filtrage.
-    Pour le WGS bactérien, les lectures longues (>10 kb) sont préférables pour l'assemblage.
-    Les Q-scores indiquent la précision de l'appel de bases.
+    <strong>NanoStat metrics for Nanopore reads:</strong>
+    Rows with suffix <em>_raw</em> are reads before filtering (Filtlong).
+    Rows with suffix <em>_filtered</em> are reads after filtering.
+    For bacterial WGS, long reads (>10 kb) are preferred for assembly.
+    Q-scores indicate base-calling accuracy.
