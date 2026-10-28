@@ -12,11 +12,6 @@ def multiqc_inputs():
     return dirs
 
 
-rule all_multiqc:
-    input:
-        "results/QC_report/multiqc_report.html"
-
-
 rule multiqc:
     input:
         fastqc_raw = expand("data/intermediate/QC_raw/{sample}/{sample}_R1_001_fastqc.zip", sample=ALL_ILLUMINA_SAMPLES) +
@@ -53,11 +48,5 @@ rule multiqc:
 
 rule all_qc:
     input:
-        # Illumina: ensure trimmed reads are generated
-        expand("data/intermediate/trimgalore/{sample}/{sample}_val_1.fq.gz", sample=ALL_ILLUMINA_SAMPLES),
-        expand("data/intermediate/trimgalore/{sample}/{sample}_val_2.fq.gz", sample=ALL_ILLUMINA_SAMPLES),
-        # Nanopore: ensure NanoStats files are generated
-        expand("data/intermediate/QC_raw/{sample}/{sample}_raw_NanoStats.txt", sample=ALL_NANOPORE_SAMPLES),
-        expand("data/intermediate/QC_trimmed/{sample}/{sample}_filtered_NanoStats.txt", sample=ALL_NANOPORE_SAMPLES),
-        # MultiQC report
         "results/QC_report/multiqc_report.html"
+
