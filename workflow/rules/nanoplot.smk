@@ -1,3 +1,14 @@
+def get_nanopore_file(wildcards):
+    """Return the source type ('nanopore' local or 'sra') for a Nanopore sample.
+    Used with Snakemake's branch() to route inputs in filtlong and nanoplot rules.
+    """
+    sample = wildcards.sample
+    if samples.loc[sample, "type"] == "nanopore":
+        return "nanopore"
+    elif samples.loc[sample, "type"] == "nanopore sra":
+        return "sra"
+
+
 ### NanoPlot on raw reads (before Filtlong) ###
 
 rule all_nanoplot_raw:
