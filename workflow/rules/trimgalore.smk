@@ -45,6 +45,7 @@ rule trimgalore:
             -q {params.quality_cut} \
             --length {params.min_len} \
             --basename {wildcards.sample} \
+			--paired \
             {params.extra_params} \
             {input.read_1} \
             {input.read_2} &> {log}
