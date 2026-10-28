@@ -7,7 +7,6 @@ configuration:
   genome_size: 2821361
   species: 'Staphylococcus aureus'
   plasmid_tool: 'platon,plasclass'
-  tech: 'illumina'  
 resources:
   threads: 6
   mem_mb: 10000
