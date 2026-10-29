@@ -6,8 +6,15 @@
 
 ### Summary
 
-**bactRline** is a Snakemake-based workflow for the assembly and characterization of bacterial genomes from whole-genome sequencing (WGS) data. It automates the processing of raw sequencing reads through quality control, assembly, and annotation steps.
-We have provided a step-by-step description of how to set up the working environment and the configuration to run it. We recommend that you read the instructions below carefully to obtain the desired results.
+**bactRline** is a Snakemake-based workflow for the assembly and
+characterization of bacterial genomes from whole-genome sequencing
+(WGS) data. It automates the processing of raw sequencing reads
+through quality control, assembly, and annotation steps.
+
+We have provided a step-by-step description of how to set up the
+working environment and the configuration to run it. We recommend that
+you read the instructions below carefully to obtain the desired
+results.
 
 Tools Used:
   * Pre-processing: TrimGalore, Filtlong
@@ -15,6 +22,7 @@ Tools Used:
   * Quality evaluation: QUAST, Kraken2, CheckM2
   * Annotation and typing: AMRFinderPlus, pyMLST
   * (Optional) Plasmid detection: Platon, PlasClass
+  * (Optional) Raw reads QC: FastQC, Nanoplot, MultiQC
 
 The workflow accepts the following input formats:
   * Illumina: paired-end reads in `.fastq.gz` format
@@ -77,13 +85,6 @@ configuration:
 
 > Important: If you are analyzing data from *E. coli* or *S. aureus*, make sure to use the correct formatting in the species field: 'Escherichia coli' or 'Staphylococcus aureus'.
 
-```
-resources:
-  threads: 6       # Number of CPU threads to use
-  mem_mb: 10000    # Maximum memory in megabytes to allocate per job
-```
-
-> Adjust these values based on the resources in your system.
 
 ```
 amrfinder:
@@ -105,16 +106,28 @@ Please, if you use a script in both cases, check the output files `config/config
 For the pipeline, you need to provide a reference genome. You can place it in a `resources/reference/` directory, but please change the path in the configuration file.
 
 
-#### 4. Configuration file option
+#### 4. Runtime and tools options
 
-You can change the resources maximal that can be used by certain rules with `threads` : the number of threads, and `mem_mb` : RAM in MB. \
-You can add any parameters you like to `extra_params` for each tool.
-> We recommend using the `--memory-mapping` option for Kraken2 if you have 16GB RAM or less.
+In the `config/config.yml` file, you can change a certain number of
+fixe options for each step of the pipeline. 
+Moreover, you can add any parameters you like to `extra_params` for each tool.
+
+
+You can change the resources maximal that can be used by certain rules
+with `threads` : the number of threads, and `mem_mb` : RAM in MB. \
+
+```
+resources:
+  threads: 6       # Number of CPU threads to use
+  mem_mb: 10000    # Maximum memory in megabytes to allocate per job
+```
+
+> We recommend using the `--memory-mapping` option for Kraken2 and `--lowmem` option for checkm2 if you have 16GB RAM or less.
 
 
 #### 5. Installation of databases
 
-The Kraken2, CheckM2, AMRFinderPlus, pyMLST and Platon tools require a database to run. If you already have the database, you can simply enter the path in the configuration file. Otherwise, you can use the following commands to install one database at a time:
+The Kraken2, CheckM2, AMRFinderPlus, pyMLST and Platon tools require a database to run. If you already have the database, you can simply specify the path in the configuration file. Otherwise, you can use the following commands to install one database at a time:
 
 ```
 snakemake install_amrfinder_db --use-conda      # To initiallise AMRFinderPlus database
@@ -176,14 +189,20 @@ snakemake all_assembly --use-conda
 ```
 
 
-### Test
+### Raw reads quality controls 
 
-To avoid errors, particularly during the first run to initialize the pyMLST database, and to check that the configuration file is correctly configured, you can run the pipeline with a single sample.
+You can perform quality control on raw reads before and after trimming with TrimGalore or Filtlong by using the alternate QC module of the pipeline:
+
+```
+snakemake --use-conda all_qc
+```
+
+The results are combined with MultiQC and visible on `results/QC_report/multiqc_report.html`.
 
 
 ### Output Files
 
-The pipeline gives three final reports, which you can find in the `workflow/reports/` directory.
+The pipeline gives three final reports, which you can find in the `results/report/` directory.
 
 #### Quality report
 

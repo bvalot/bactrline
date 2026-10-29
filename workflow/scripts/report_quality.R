@@ -86,7 +86,7 @@ for (file in files_list_quast) {
     
     # Extracting the sample name from the directory name
     path <- sub("/transposed_report.tsv", "", file)
-    sample_name <- sub("data/intermediate/quast/", "", path)
+    sample_name <- basename(path)
     
     # Selection of columns to keep
     col_to_keep <- c("# contigs (>= 0 bp)", "Total length (>= 0 bp)", "Largest contig", "Reference length", "GC (%)", "Reference GC (%)", "N50", "L50")
@@ -123,7 +123,7 @@ for (file in files_list_checkm) {
     
     # Extracting the sample name from the directory name
     path <- sub("/quality_report.tsv", "", file)
-    sample_name <- sub("data/intermediate/checkm2/", "", path)
+    sample_name <- basename(path)
     
     # Selection of columns to keep
     cols_to_keep <- c("Completeness", "Contamination")
@@ -149,8 +149,12 @@ report_list <- list(final_report_kraken, final_report_quast, final_report_checkm
 # Merge all report into the final report
 final_report <- Reduce(function(x, y) merge(x, y, by="Sample"), report_list)
 
+# Add Tech_type column from the sample type mapping passed by Snakemake
+tech_type_map <- snakemake@params[["tech_type"]]
+final_report$"Tech_type" <- unlist(tech_type_map[final_report$Sample])
+
 # Change the order of the final report
-final_report <- final_report[,c("Sample", "Contigs", "Total length", "Largest contig", "GC (%)", "N50", "L50", "Major Genus", "Major Genus (%)", "Major Species", "Major Species (%)", "Other Genus", "Other Species", "Reference length", "Reference GC (%)", "Completeness", "Contamination")]
+final_report <- final_report[,c("Sample", "Tech_type", "Contigs", "Total length", "Largest contig", "GC (%)", "N50", "L50", "Major Genus", "Major Genus (%)", "Major Species", "Major Species (%)", "Other Genus", "Other Species", "Reference length", "Reference GC (%)", "Completeness", "Contamination")]
 
 # Define threshold variable 
 genome_size <- snakemake@params[["genome_size"]]

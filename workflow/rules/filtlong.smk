@@ -13,7 +13,7 @@ rule all_filtlong:
         
 rule filtlong:
     input:
-        reads = branch(
+        raw_read = branch(
             get_nanopore_file,
             cases={
                 "nanopore": lambda wc: nanopore.loc[wc.sample, "folder/file"],
@@ -31,7 +31,7 @@ rule filtlong:
         extra_params = config['filtlong']['extra_params']
     shell:
         """
-        read_path="{input.reads}"
+        read_path="{input.raw_read}"
         read_path="${{read_path%/}}"
         if [ -d "$read_path" ]; then
 		    if [ ! -d "data/raw/nanopore/" ]; then

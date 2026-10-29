@@ -13,7 +13,7 @@ resources:
 trimgalore:
   minimum_length: 30
   quality_cutoff: 20
-  extra_params: '--paired'
+  extra_params: ''
 filtlong:
   min_length: 1000
   percent: 90

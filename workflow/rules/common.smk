@@ -54,3 +54,4 @@ samples.loc[samples.index.isin(SRA_NANOPORE_SAMPLES), "type"] = "nanopore sra"
 samples.loc[samples.index.isin(ILLUMINA_SAMPLES), "type"] = "illumina"
 samples.loc[samples.index.isin(SRA_ILLUMINA_SAMPLES), "type"] = "illumina sra"
 
+

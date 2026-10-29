@@ -8,6 +8,9 @@ plasmid_tool <- snakemake@params[["plasmid_tool"]]
 # Species specified
 species <- snakemake@params[["species"]]
 
+# Sample type mapping (sample -> tech type)
+tech_type_map <- snakemake@params[["tech_type"]]
+
 
 
 ### AMR ###
@@ -273,6 +276,13 @@ if (sum(gene_info$Type == "VIRULENCE") > 0) {
 
 # Merge all report into the final report
 final_report <- Reduce(function(x, y) merge(x, y, by="Sample"), report_list)
+
+# Add Tech_type column right after Sample
+final_report$"Tech_type" <- unlist(tech_type_map[final_report$Sample])
+final_report <- final_report[, c("Sample", "Tech_type", setdiff(colnames(final_report), c("Sample", "Tech_type")))]
+
+# Add an empty cell in header1 for the Tech_type column (keeps alignment)
+header1 <- c("", "", header1[-1])
 
 # Add second header
 header2 <- colnames(final_report)

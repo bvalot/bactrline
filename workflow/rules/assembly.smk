@@ -3,10 +3,11 @@ rule all_assembly:
         expand("data/intermediate/assembled/{sample}_assembled/contigs.fasta", sample=ALL_ILLUMINA_SAMPLES)
 
 
+
 rule assembly:
     input:
-        sub_read1 = "data/intermediate/subsample/{sample}_val_1_sub.fastq.gz",
-        sub_read2 = "data/intermediate/subsample/{sample}_val_2_sub.fastq.gz"
+        sub_read1 = "data/intermediate/subsample/{sample}/{sample}_val_1_sub.fastq.gz",
+        sub_read2 = "data/intermediate/subsample/{sample}/{sample}_val_2_sub.fastq.gz"
     output:
         contig_file = "data/intermediate/assembled/{sample}_assembled/contigs.fasta"
     conda:

@@ -1,7 +1,8 @@
 rule all_annotation: 
     input:
-        "workflow/reports/annotation_report.tsv",
-        "workflow/reports/gene_amr_summary.tsv"
+        "results/report/annotation_report.tsv",
+        "results/report/gene_amr_summary.tsv"
+
 
 
 rule annotation:
@@ -14,13 +15,14 @@ rule annotation:
         platon_tsv = expand("data/intermediate/platon/{sample}/{sample}.tsv", sample=samples.index) if config['configuration']['plasmid_tool'] == 'platon' or config['configuration']['plasmid_tool'] == 'platon,plasclass' else [],
         plasclass_tsv = expand("data/intermediate/plasclass/{sample}.tsv", sample=samples.index) if config['configuration']['plasmid_tool'] == 'plasclass' or config['configuration']['plasmid_tool'] == 'platon,plasclass' else []
     output:
-        report = "results/annotation_report.tsv",
-        gene_report = "results/gene_amr_summary.tsv"
+        report = "results/report/annotation_report.tsv",
+        gene_report = "results/report/gene_amr_summary.tsv"
     conda:
         "../envs/R.yml"
     log:
         "logs/annotation/annotation.log"
     params:
+        tech_type = samples["type"].to_dict(),
         species = config['configuration']['species'],
         plasmid_tool = config['configuration']['plasmid_tool'],
         min_length = config['annotation']['min_length'],
